@@ -1,8 +1,8 @@
 """Models and database functions for Hiker project."""
-
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import datetime
-import correlation
+#import correlation
 
 
 # This is the connection to the PostgreSQL database; we're getting this through
@@ -30,7 +30,7 @@ class User(db.Model):
     __tablename__ = "users"
 
     user_id = db.Column(db.String(20), primary_key=True)
-    first_name = db.Column(db.String(20), nullable=False)
+    first_name = db.Column(db.String(30), nullable=False)
     last_name = db.Column(db.String(30), nullable=False)
     email = db.Column(db.String(64), nullable=False)
     password = db.Column(db.String(64), nullable=False)
@@ -191,7 +191,7 @@ class GeodataTrip(db.Model):
 
     hike_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     trip_code = db.Column(db.String(10), db.ForeignKey('trips.trip_code'), nullable=False)
-    geo_id = db.Column(db.String(20), db.ForeignKey('geodata.geo_id'), nullable=False)
+    geo_id = db.Column(db.Integer, db.ForeignKey('geodata.geo_id'), nullable=False)
 
     def __repr__(self):
         """Provide helpful representation when printed."""

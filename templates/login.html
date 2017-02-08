@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<div class="col-xs-6">
+    <h1>User Login</h1>
+
+    <form action="/login" method="POST">
+        UserName: <input type="text" name="username"><br>
+        Password: <input type="password" name="password"><br>
+        <input type="submit" value="submit"><br>
+    </form>
+</div>
+
+
+
+{% endblock %} 

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<div class="col-xs-12">
+    <h1>User Registration</h1>
+    <form action="/register" method="POST">
+        User Name: <input type="text" name="username"><br>
+        First Name: <input type="text" name="firstname"><br>
+        Last Name: <input type="text" name="lastname"><br>
+        Email: <input type="text" name="email"><br>
+        Password: <input type="password" name="password"><br>
+        Zip Code: <input type="text" name="zipcode"><br>
+        <input type="submit" value="submit"><br>
+        
+    </form>
+</div>
+
+{% endblock %}
