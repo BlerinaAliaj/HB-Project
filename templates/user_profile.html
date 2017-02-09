@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <h2> Hello {{ name }} </h2>
+
+    <a href="/new_trip">Create New Trip</a>
+
+    <p>This is a list of previous trips:</p>
+
+    <ul>
+      {% for trip in trips %}
+          <li>
+              <a href="/trip_detail/{{ trip.trip_code }}">
+                {{ trip.trip_name }}</a> 
+          </li>
+      {% endfor %}
+    </ul>
+
+{% endblock %}

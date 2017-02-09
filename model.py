@@ -62,9 +62,9 @@ class Trip(db.Model):
     trip_code = db.Column(db.String(10), primary_key=True, nullable=False)
     trip_name = db.Column(db.String(60), nullable=False)
     date_created = db.Column(db.DateTime, nullable=False)
-    date_start = db.Column(db.DateTime, nullable=True)
-    start_loc = db.Column(db.Integer, nullable=True)
-    end_loc = db.Column(db.Integer, nullable=True)
+    date_start = db.Column(db.String(50), nullable=True)
+    start_loc = db.Column(db.String(50), nullable=True)
+    end_loc = db.Column(db.String(50), nullable=True)
     num_days = db.Column(db.Integer, nullable=True)
 
     def __repr__(self):

@@ -6,12 +6,26 @@
 </head>
 
 <body>
+  <div>
+    </form>
+      <ul class="nav navbar-nav navbar-right">
+        {% if 'user' in session %}
+              
+          <li><a href="/logout">Logout</a></li>
+    
+        {% endif %}
+      </ul>
+  </div>
+
+
   <div class="container-fluid">
     <ul>
       {% for message in get_flashed_messages() %}
         <li>{{ message }}</li>
       {% endfor %}
     </ul>
+
+
   {% block content %} put your content here {% endblock %}
   </div>
 </body>

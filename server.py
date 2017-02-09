@@ -5,6 +5,7 @@ from flask import Flask, render_template, redirect, request, flash, session, jso
 from flask_debugtoolbar import DebugToolbarExtension
 
 from model import User, Trip, UserTrip, Comment, List, Geodata, GeodataTrip, connect_to_db, db
+import datetime
 
 
 app = Flask(__name__)
@@ -52,7 +53,7 @@ def login():
             session["user"] = query_user.user_id
             user_id = query_user.user_id
             flash('You have successfully logged in.')
-            return redirect("/")
+            return redirect("/profile")
             # return redirect('/user_detail/' + str(user_id))
 
         else:
@@ -90,14 +91,134 @@ def register():
                     email=email, password=password, zipcode=zipcode)
         db.session.add(user)
         db.session.commit()
+        session['user'] = username
 
     else:
         flash("""That username is already taken. Please choose another one or
             go to login page""")
         return redirect("/register")
 
+    # return redirect('/')
+    return redirect('/profile')
+
+
+@app.route('/profile')
+def user_detail():
+    """User detail page"""
+
+    if 'user' in session:
+        # profile page will have content based on the user logged-in
+        username = session['user']
+
+        # Query user by their username
+        query_user = User.query.get(username)
+        name = query_user.first_name
+        trips = query_user.trips
+
+        return render_template("user_profile.html", user_id=username, name=name,
+                                trips=trips)
+    else:
+        flash("You are not logged in. Please do so")
+        return redirect('/')
+
+
+@app.route('/logout')
+def logout():
+    """Logs out user"""
+
+    del session["user"]
+    flash("You have been successfully logged out.")
+
     return redirect('/')
-    # return redirect('/profile')
+
+
+@app.route('/member_profile/<user_id>')
+def display_friend_info(user_id):
+    """ This page will display all info for other members of your group """
+
+    pass
+
+
+@app.route('/new_trip', methods=["GET"])
+def get_trip_data():
+    """Template to create new trip"""
+
+    if 'user' in session:
+        return render_template("new_trip.html")
+    else:
+        flash("You are not logged in. Please do so.")
+        return redirect('/')
+
+
+@app.route('/new_trip', methods=["POST"])
+def create_trip():
+    """Route that will log new trip information to database"""
+
+    #To create new trip we need add to Trip and UserTrip to log everything in
+    # Trip: trip_code, trip_name, date_created, date_start, start_loc, end_loc
+    # num_days
+
+    # UserTrip: trip_code, user_id
+
+    if 'user' in session:
+        username = session['user']
+        trip_code = request.form.get('tripcode')
+        trip_name = request.form.get('tripname')
+        date_created = datetime.datetime.now()
+        date_start = request.form.get('datestart')
+        start_loc = request.form.get('startloc')
+        end_loc = request.form.get('endloc')
+        num_days = int(request.form.get('numdays'))
+
+        # write new trip object to database:
+        new_trip = Trip(trip_code=trip_code, trip_name=trip_name, date_created=date_created,
+                       date_start=date_start, start_loc=start_loc, end_loc=end_loc,
+                       num_days=num_days)
+        new_trip_log = UserTrip(trip_code=trip_code, user_id=username)
+
+        # add trip objects to database and commit
+        db.session.add(new_trip)
+        db.session.commit()
+        db.session.add(new_trip_log)
+        db.session.commit()
+
+        return redirect('/profile')
+        # return redirect('/trip_detail/<'+trip_code+'>')
+    else:
+        flash("You are not logged in. Please do so.")
+        return redirect('/')
+
+
+@app.route('/trip_detail/<trip_code>')
+def trip_detail(trip_code):
+    """Page that displays all information about the trip.
+
+    This is where all the cool stuff happens :)
+    """
+    print trip_code
+    # UserTrip: trip_code, user_id
+
+    if 'user' in session:
+        # get username from session
+        username = session['user']
+
+        # Start quering all information for the trip page
+        query_user = User.query.get(username)
+        query_trip = Trip.query.get(trip_code)
+
+        # Query present user name and trip name
+        name = query_user.first_name
+        trip_name = query_trip.trip_name
+
+        # Query all other members for the group
+        members = Trip.query.get(trip_code).users
+
+        # add information for display in the webpage
+        return render_template('trip_detail.html', username=username,
+                name=name, trip_name=trip_name, members=members)
+    else:
+        flash("You are not logged in. Please do so.")
+        return redirect('/')
 
 
 # @app.route('/users')
@@ -108,27 +229,7 @@ def register():
 #     return render_template("user_list.html", users=users)
 
 
-# @app.route('/user_detail/<user_id>')
-# def user_detail(user_id):
-#     """User detail page"""
 
-#     query_user = User.query.filter_by(user_id=user_id).first()
-
-#     age = query_user.age
-#     zipcode = query_user.zipcode
-#     ratings = query_user.ratings
-
-#     return render_template("user_detail.html", user_id=user_id, age=age, zipcode=zipcode, ratings=ratings)
-
-
-# @app.route('/logout')
-# def logout():
-#     """Logs out user"""
-
-#     del session["user"]
-#     flash("You have been successfully logged out.")
-
-#     return redirect('/')
 
 
 # @app.route('/movies')
@@ -194,3 +295,4 @@ if __name__ == "__main__":
 
 
     app.run(port=5000, host='0.0.0.0')
+

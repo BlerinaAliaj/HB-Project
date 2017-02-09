@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<div class="col-xs-12">
+    <h1>Please fill out information about your trip below:</h1>
+    <form action="/new_trip" method="POST">
+        Trip Code: <input type="text" name="tripcode"><br>
+        Trip Name: <input type="text" name="tripname"><br>
+        Start Date: <input type="text" name="datestart"><br>
+        Start Location: <input type="text" name="startloc"><br>
+        End Location: <input type="password" name="endloc"><br>
+        Number of Days: <input type="text" name="numdays"><br>
+        <input type="submit" value="submit"><br>
+        
+    </form>
+</div>
+
+{% endblock %}

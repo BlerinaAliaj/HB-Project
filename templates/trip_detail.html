@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<div class="col-xs-12">
+    <h1>Hello {{ name }}:</h1>
+    <h1>Welcome to {{ trip_name }} trip page. </h1>
+    
+    <h2>People that are joining you on this trip:</h2>
+
+    <ul>
+        {% for member in members %}
+            {% if member.user_id != username %}
+
+            <li>
+              <a href="/member_profile/{{ username }}">
+                {{ member.first_name }} {{ member.last_name }}</a> 
+            </li>
+
+          {% endif %}
+      {% endfor %}
+
+    </ul>
+
+</div>
+
+{% endblock %}
