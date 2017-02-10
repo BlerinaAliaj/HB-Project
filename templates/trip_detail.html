@@ -24,4 +24,74 @@
 
 </div>
 
+<div class="messages">
+  <h1>Group Communication:</h1>
+  <form action="/message/{{ trip_code }}" method="POST">
+    <textarea rows="4" cols="80" id="mytext" name="mymessage"></textarea>
+    <input type="submit" value="Send Message" >
+  
+   <ul>
+    {% for message in messages %}
+    <li> {{ message.comment }}</li>
+    {% endfor %}
+
+  </ul>
+  
+  </form>
+  <script src="https://code.jquery.com/jquery.js"></script>
+  <script type="text/javascript">
+
+
+
+  </script>
+
+
+<div class="list">
+
+  <h1> Your List here</h1>
+
+  <form>
+    <table>
+      <tr>
+        <tr>Action Items</tr>
+        <tr>Action assigned to</tr>
+        <tr>Completed</tr>
+      </tr><br>
+      {% if items %}
+      {% for item in items %}
+      <tr>
+          <tr>{{ item.description }}</tr>
+          <tr>{{ item.user_id }}</tr>
+          <tr>{{ item.completed }} </tr><br>
+      
+      </tr>
+      {% endfor %}
+      {% endif %}
+      <tr>
+        <form action="/list/{{ trip_code }}" method="POST">
+          <tr><input type="text" name="description"></tr>
+          <tr><input type="text" name="userid"></tr>
+          <tr><input type="checkbox" name="completed" value="True"></tr>
+          <input type="submit" value="additem">
+
+      </tr>
+
+
+
+
+    </table>
+
+
+
+  </form>
+
+
+
+
+
+
+</div>
+
+</div>
+
 {% endblock %}

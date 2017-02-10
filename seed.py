@@ -9,6 +9,8 @@ from model import User
 from model import Trip
 from model import UserTrip
 from model import Geodata
+from model import Comment
+
 from model import connect_to_db, db
 from server import app
 
@@ -91,6 +93,14 @@ if __name__ == "__main__":
     trip8 = UserTrip(trip_code='bear0', user_id='hlin')
     trip9 = UserTrip(trip_code='king0', user_id='hlin')
 
+    mess1 = Comment(trip_code='yos0', user_id='eagle5', comment="We should take my car",
+                    time=datetime.datetime.now())
+    mess2 = Comment(trip_code='yos0', user_id='hlin', comment="Great idea!!!!",
+                    time=datetime.datetime.now())
+    mess3 = Comment(trip_code='yos0', user_id='souali', comment="Who's driving?",
+                    time=datetime.datetime.now())
+
+
     # Add new objects to session, so they'll persist
     db.session.add(alain)
     db.session.add(sofiane)
@@ -110,6 +120,12 @@ if __name__ == "__main__":
     db.session.add(trip9)
 
     db.session.commit()
+    db.session.add(mess1)
+    db.session.add(mess2)
+    db.session.add(mess3)
+
+    db.session.commit()
+
 
     # Import different types of data
     # load_geodata()

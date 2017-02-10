@@ -113,10 +113,18 @@ def user_detail():
         # Query user by their username
         query_user = User.query.get(username)
         name = query_user.first_name
+
+        # query trips and show them in reverse chronological order
         trips = query_user.trips
+        # use the sorted built-in function with lamda function where the key
+        # we are using to sort by is the date trip was created. Will reverse
+        # list to show latest trip first
+        sorted_trips = sorted(trips, key=lambda x: x.date_created, reverse=True)
+
+
 
         return render_template("user_profile.html", user_id=username, name=name,
-                                trips=trips)
+                                trips=sorted_trips)
     else:
         flash("You are not logged in. Please do so")
         return redirect('/')
@@ -182,8 +190,8 @@ def create_trip():
         db.session.add(new_trip_log)
         db.session.commit()
 
-        return redirect('/profile')
-        # return redirect('/trip_detail/<'+trip_code+'>')
+        # return redirect('/profile')
+        return redirect('/trip_detail/'+trip_code)
     else:
         flash("You are not logged in. Please do so.")
         return redirect('/')
@@ -195,7 +203,7 @@ def trip_detail(trip_code):
 
     This is where all the cool stuff happens :)
     """
-    print trip_code
+    #print trip_code
     # UserTrip: trip_code, user_id
 
     if 'user' in session:
@@ -205,6 +213,8 @@ def trip_detail(trip_code):
         # Start quering all information for the trip page
         query_user = User.query.get(username)
         query_trip = Trip.query.get(trip_code)
+        query_comment = Comment.query.filter_by(trip_code=trip_code)
+        query_list = List.query.filter_by(trip_code=trip_code)
 
         # Query present user name and trip name
         name = query_user.first_name
@@ -213,71 +223,68 @@ def trip_detail(trip_code):
         # Query all other members for the group
         members = Trip.query.get(trip_code).users
 
+        # Query messages
+        messages = query_comment.all()
+        sorted_messages = sorted(messages, key=lambda x: x.time, reverse=True )
+
+        # Query Lists:
+        items = query_list.all()
+        #print items
+
+
+
         # add information for display in the webpage
         return render_template('trip_detail.html', username=username,
-                name=name, trip_name=trip_name, members=members)
+                name=name, trip_name=trip_name, members=members, 
+                messages=sorted_messages, trip_code=trip_code, items=items)
     else:
         flash("You are not logged in. Please do so.")
         return redirect('/')
 
 
-# @app.route('/users')
-# def user_list():
-#     """Show list of users."""
+@app.route('/message/<trip_code>', methods=["POST"])
+def commit_message(trip_code):
+    """Write messages to server """
 
-#     users = User.query.all()
-#     return render_template("user_list.html", users=users)
+    username = session['user']
+    print trip_code
+
+    message = request.form.get("mymessage")
+
+    # Write message to database
+
+    my_message = Comment(trip_code=trip_code, user_id=username, comment=message,
+                         time=datetime.datetime.now())
+    db.session.add(my_message)
+    db.session.commit()
+    return redirect("/trip_detail/"+trip_code)
+
+@app.route('/list/<trip_code>', methods=["POST"])
+def add_to_list(trip_code):
+    """Adds items to list table"""
+
+    #print trip_code
+
+    username = session['user']
+    list_item = request.form.get("description")
+    print list_item
+    user_id = request.form.get("userid")
+    completed = request.form.get("completed")
+    # print completed
+
+    # Write list to database
+
+    my_list = List(trip_code=trip_code, user_id=user_id, description=list_item,
+                        completed=completed)
+
+    db.session.add(my_list)
+    db.session.commit()
+    return redirect("/trip_detail/"+trip_code)
 
 
 
 
 
-# @app.route('/movies')
-# def movie_list():
-#     """Lists of movies"""
-
-#     movies = Movie.query.order_by(Movie.title)
-
-#     return render_template("movie_list.html", movies=movies)
-
-
-# @app.route('/movie_detail/<movie_id>')
-# def movie_detail(movie_id):
-#     """User detail page"""
-
-#     query_movie = Movie.query.filter_by(movie_id=movie_id).first()
-#     title = query_movie.title
-#     ratings = query_movie.ratings
-
-#     if 'user' in session:
-#         user_id = session['user']
-#         user_rating = Rating.query.filter( (Rating.movie_id == movie_id) & (Rating.user_id == user_id) ).first()
-
-#     return render_template("movie_detail.html", title=title, ratings=ratings, user_rating=user_rating, movie_id=movie_id)
-
-
-# @app.route('/rate_movie', methods=["POST"])
-# def rate_movie():
-
-#     my_rating = request.form.get("my_rating")
-#     movie_id = request.form.get("movie_id")
-#     user_id = session['user']
-
-#     query_rating = Rating.query.filter((Rating.user_id == user_id) & (Rating.movie_id == movie_id)).first()
-
-#     if query_rating:
-#         query_rating.score = my_rating
-
-#     else:
-#         new_rating = Rating(movie_id=movie_id,
-#                         user_id=user_id,
-#                         score=my_rating)
-#         db.session.add(new_rating)
-
-#     db.session.commit()
-#     # else update the user/movie rating
-
-#     return my_rating
 
 
 

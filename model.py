@@ -102,6 +102,7 @@ class Comment(db.Model):
     comment_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     trip_code = db.Column(db.String(10), db.ForeignKey('trips.trip_code'), nullable=False)
     user_id = db.Column(db.String(20), db.ForeignKey('users.user_id'), nullable=False)
+    comment = db.Column(db.Text, nullable=True)
     time = db.Column(db.DateTime, nullable=False)
 
     # Define relationship to trip
