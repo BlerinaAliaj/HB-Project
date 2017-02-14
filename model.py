@@ -168,7 +168,7 @@ class Geodata(db.Model):
     lon = db.Column(db.Integer, nullable=False)
     lat = db.Column(db.Integer, nullable=False)
     length = db.Column(db.Integer, nullable=True)
-    park = db.Column(db.String(100), nullable=False)
+    park = db.Column(db.String(100), nullable=False) # make this True
     desc = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(250), nullable=True)
     elevation = db.Column(db.Integer, nullable=True)

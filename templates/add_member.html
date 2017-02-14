@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<div class="col-xs-12">
+    <h1>Please Add Members To your trip:</h1>
+    <form action="/new_trip/<trip_code>" method="POST">
+        Member ID: <select name="memberid">
+                    {% for user in users %}
+                    <option value={{user.user_id}}>{{user.user_id}}, {{ user.first_name }} {{ user.last_name }}</option>
+
+                    {% endfor %}
+
+                   </select>
+        
+        <input type="submit" value="submit"><br>
+        
+    </form>
+</div>
+
+{% endblock %}

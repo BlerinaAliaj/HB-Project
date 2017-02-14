@@ -3,6 +3,7 @@
 from jinja2 import StrictUndefined
 from flask import Flask, render_template, redirect, request, flash, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
+import json
 
 from model import User, Trip, UserTrip, Comment, List, Geodata, GeodataTrip, connect_to_db, db
 import datetime
@@ -270,7 +271,9 @@ def add_to_list(trip_code):
     print list_item
     user_id = request.form.get("userid")
     completed = request.form.get("completed")
-    # print completed
+    if not completed:
+        completed = False
+
 
     # Write list to database
 
@@ -281,11 +284,56 @@ def add_to_list(trip_code):
     db.session.commit()
     return redirect("/trip_detail/"+trip_code)
 
+@app.route('/add_member/<trip_code>', methods=["GET"])
+def add_members_form(trip_code):
+    """Option to add members to trip"""
+
+    users = User.query.all()
+
+    return render_template("add_member.html", users=users, trip_code=trip_code)
+
+
+@app.route('/add_member/<trip_code>', methods=["POST"])
+def add_members(trip_code):
+    """Add members to trip """
+
+    users = User.query.all()
+
+    return render_template("add_member.html", users=users, trip_code=trip_code)
+
+
+@app.route('/add_marker/<trip_code>', methods=["GET"])
+def query_marker_data():
+    """Queries GeodataUsers Table to see if route is chosen """
+
+    # query_geodata = GeodataUsers.query.filter_by(trip_code=trip_code).all()
+
+    # if query_geodata:
 
 
 
 
 
+    pass
+
+
+@app.route('/add_marker.json', methods=["POST"])
+def add_marker_data():
+    """Gets the marker data and writes them to tables in database """
+
+    content = request.form.get('data')
+    my_markers = json.loads(content)
+
+    print my_markers
+
+    # markers = request.form.get
+    # lat = request.form.get("lat")
+    # lng = request.form.get("lng")
+    # trip_code = request.form.get("trip_code")
+    # geo_id = request.form.get("merker_id")
+
+    # marker = Geodata()
+    return jsonify(content)
 
 
 
@@ -300,6 +348,5 @@ if __name__ == "__main__":
     # Use the DebugToolbar
     DebugToolbarExtension(app)
 
-
+    
     app.run(port=5000, host='0.0.0.0')
-
