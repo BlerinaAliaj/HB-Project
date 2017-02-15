@@ -165,8 +165,8 @@ class Geodata(db.Model):
     __tablename__ = "geodata"
 
     geo_id = db.Column(db.Integer, primary_key=True)
-    lon = db.Column(db.Integer, nullable=False)
-    lat = db.Column(db.Integer, nullable=False)
+    lon = db.Column(db.Float, nullable=False)
+    lat = db.Column(db.Float, nullable=False)
     length = db.Column(db.Integer, nullable=True)
     park = db.Column(db.String(100), nullable=False) # make this True
     desc = db.Column(db.Text, nullable=True)
@@ -199,6 +199,26 @@ class GeodataTrip(db.Model):
 
         s = "<GeodataTrip hike_id=%s trip_code=%s geo_id=%s>"
         return s % (self.hike_id, self.trip_code, self.geo_id)
+
+
+class Route(db.Model):
+    """Table logging in trip markers with location and description """
+
+    __tablename__ = "routes"
+
+    route_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    trip_code = db.Column(db.String(10), db.ForeignKey('trips.trip_code'), nullable=False)
+    lon = db.Column(db.Float, nullable=False)
+    lat = db.Column(db.Float, nullable=False)
+    description = db.Column(db.String(50), nullable=True)
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        s = "<Routes trip_code=%s lon=%s lat=%s description=%s>"
+        return s % (self.trip_code, self.lon, self.lat, self.description)
+
+    trip = db.relationship("Trip", backref=db.backref("routes"))
 
 
 

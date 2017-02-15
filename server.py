@@ -4,8 +4,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, redirect, request, flash, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 import json
-
-from model import User, Trip, UserTrip, Comment, List, Geodata, GeodataTrip, connect_to_db, db
+from model import User, Trip, UserTrip, Comment, List, Geodata, GeodataTrip, Route, connect_to_db, db
 import datetime
 
 
@@ -230,14 +229,12 @@ def trip_detail(trip_code):
 
         # Query Lists:
         items = query_list.all()
-        #print items
-
 
 
         # add information for display in the webpage
-        return render_template('trip_detail.html', username=username,
-                name=name, trip_name=trip_name, members=members, 
-                messages=sorted_messages, trip_code=trip_code, items=items)
+        return render_template('trip_detail.html', username=username, name=name,
+                    trip_name=trip_name, members=members, messages=sorted_messages,
+                    trip_code=trip_code, items=items)
     else:
         flash("You are not logged in. Please do so.")
         return redirect('/')
@@ -284,11 +281,13 @@ def add_to_list(trip_code):
     db.session.commit()
     return redirect("/trip_detail/"+trip_code)
 
+
 @app.route('/add_member/<trip_code>', methods=["GET"])
 def add_members_form(trip_code):
     """Option to add members to trip"""
 
-    users = User.query.all()
+    username = session['user']
+    users = User.query.filter(User.user_id != username).all()
 
     return render_template("add_member.html", users=users, trip_code=trip_code)
 
@@ -299,22 +298,22 @@ def add_members(trip_code):
 
     users = User.query.all()
 
-    return render_template("add_member.html", users=users, trip_code=trip_code)
-
-
-@app.route('/add_marker/<trip_code>', methods=["GET"])
-def query_marker_data():
-    """Queries GeodataUsers Table to see if route is chosen """
-
-    # query_geodata = GeodataUsers.query.filter_by(trip_code=trip_code).all()
-
-    # if query_geodata:
-
-
-
-
-
     pass
+
+
+@app.route('/add_marker.json/<trip_code>')
+def load_markers(trip_code):
+    """Uploads markers if they exist to map"""
+
+    query_routes = Route.query.filter_by(trip_code=trip_code).all()
+    routes = {}
+
+    for route in query_routes:
+        routes[route.route_id] = {"lng": route.lon,
+                                  "lat": route.lat,
+                                  "description": route.description}
+
+    return jsonify(routes)
 
 
 @app.route('/add_marker.json', methods=["POST"])
@@ -323,17 +322,27 @@ def add_marker_data():
 
     content = request.form.get('data')
     my_markers = json.loads(content)
+    trip_code = request.form.get('trip_code')
 
-    print my_markers
+    search_trip = Route.query.filter_by(trip_code=trip_code).all()
+    print search_trip
 
-    # markers = request.form.get
-    # lat = request.form.get("lat")
-    # lng = request.form.get("lng")
-    # trip_code = request.form.get("trip_code")
-    # geo_id = request.form.get("merker_id")
+    if search_trip:
+        for trip in search_trip:
+            db.session.delete(trip)
 
-    # marker = Geodata()
-    return jsonify(content)
+    else:
+        for key in my_markers:
+            print key
+            lat = my_markers[key]['lat']
+            lon = my_markers[key]['lng']
+            desc = my_markers[key].get('marker_description', None)
+
+            marker = Route(trip_code=trip_code, lon=lon, lat=lat, description=desc)
+            db.session.add(marker)
+            db.session.commit()
+
+    return redirect("/trip_detail/"+trip_code)
 
 
 
