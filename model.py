@@ -168,7 +168,7 @@ class Geodata(db.Model):
     lon = db.Column(db.Float, nullable=False)
     lat = db.Column(db.Float, nullable=False)
     length = db.Column(db.Integer, nullable=True)
-    park = db.Column(db.String(100), nullable=False) # make this True
+    park = db.Column(db.String(100), nullable=False)  # make this True
     desc = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(250), nullable=True)
     elevation = db.Column(db.Integer, nullable=True)
@@ -219,8 +219,6 @@ class Route(db.Model):
         return s % (self.trip_code, self.lon, self.lat, self.description)
 
     trip = db.relationship("Trip", backref=db.backref("routes"))
-
-
 
 
 ##############################################################################

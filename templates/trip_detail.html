@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
+
 {% block title %} 
 <meta name="viewport" content="initial-scale=1.0">
-    <meta charset="utf-8">
-
+<meta charset="utf-8">
 {% endblock %}
 
 {% block content %}
-
 <div class="col-xs-12">
     <h1>Hello {{ name }}:</h1>
     <h1>Welcome to {{ trip_name }} trip page. </h1>
@@ -27,30 +26,20 @@
 
     </ul>
     <a href="/add_member/{{ trip_code }}">Add members to this trip</a>
-
 </div>
 
 <div>
   <h1>Group Communication:</h1>
-  <form action="/message/{{ trip_code }}" method="POST">
+  <form id="sendmessage" action="/message/{{ trip_code }}" method="POST">
     <textarea rows="4" cols="80" id="mytext" name="mymessage"></textarea>
     <input id="sendbutton" type="submit" value="Send Message" >
   
-   <ul id="message">
-    {% for message in messages %}
-    <li> {{ message.comment }}</li>
-    {% endfor %}
-
-  </ul>
+   <ul id="message"></ul>
   </form>
-
-
 </div>
 
 <div class="list">
-
   <h1> Your List here</h1>
-
   <form action="/list/{{ trip_code }}" method="POST">
     <table>
       <tr>
@@ -64,226 +53,43 @@
           <tr>{{ item.description }}</tr>
           <tr>{{ item.user_id }}</tr>
           <tr>{{ item.completed }} </tr><br>
-      
       </tr>
       {% endfor %}
       {% endif %}
-   
       <tr>
           <tr><input type="text" name="description"></tr>
           <tr><input type="text" name="userid"></tr>
           <tr><input type="checkbox" name="completed" value="True"></tr>
-          <input type="submit" value="additem">
-        
+          <input type="submit" value="additem"> 
       </tr>
     </table>
     </form>
 </div>
 
-
-<script src="https://code.jquery.com/jquery.js"></script>
-
 <div>
 <h1> Your Maps go here:</h1>
-
     <div id="floating-panel">
       <input id="address" type="textbox" value="San Francisco, CA">
       <input id="submit" type="button" value="Geocode">
       <input id="submarker" type="button" value="Log This Route">
-      
-     
     </div>
-
     <div id="map" style="width: 900px; height: 400px; "></div>
-    <script>
-      var map;
-      var uniqueId = 0;
-      var markers = [];
-
-      // The function initializes the map with origin on San Francisco
-      function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: 37.774, lng: -122.431},
-          zoom: 13,
-          mapTypeId: 'terrain'
-         
-        });
-
-      $.get('/add_marker.json/'+ '{{ trip_code }}', showMarkers);
-
-        // Geocoding method geocodes one location per request when submit button
-        // is pushed. 
-        var geocoder = new google.maps.Geocoder();
-        document.getElementById('submit').addEventListener('click', function() { geocodeAddress(geocoder, map);
-        });
-        
-        // calls in function placeMarkerAndPanTo on double click action
-        map.addListener('dblclick', function(evt) {
-          placeMarkerAndPanTo(evt.latLng);
-          });
-
-
-
-      }
-
-
-      // Function that check to see if there are any markers.
-
-
-      function showMarkers(data) {
-        // my_data = JSON.parse(data);
-        console.log(data);
-        if (data) {   
-          for (var key in data) {       
-            console.log(key);
-            var value = data[key]["lat"];
-            console.log(value);
-            var myLatLng = {lat: data[key].lat, lng: data[key].lng};
-            var marker = new google.maps.Marker({
-              position: myLatLng,
-              map: map,
-              dragable: true});
-            map.panTo(myLatLng);
-            marker.id = uniqueId;
-            marker.description = data[key].description;
-            uniqueId ++;
-
-            markers.push(marker);
-
-            google.maps.event.addListener(marker, "rightclick", function (e) {
-                var content = 'Latitude: ' + marker.position.lat() + '<br />Longitude: ' + marker.position.lng();
-                content += "<br />Description:"
-                content += "<br /><input type=text id='markdesc' name = 'markerdescription'>";
-                content += "<input type='button' value='Update' onclick = 'addDescription(" + marker.id + ");' value = 'addDescription' />";
-                content += "<br /><input type = 'button' value = 'Delete Marker' onclick = 'deleteMarker(" + marker.id + ")'; value='deleteMarker'/>";
-                var infoWindow = new google.maps.InfoWindow({
-                    content: content
-                });
-                infoWindow.open(map, marker);
-            });   
-          }
-        } 
-      }
-
-
-
-      // Creates new marker and pushes marker to the markers array, pans map to
-      // the new marker
-      function placeMarkerAndPanTo(latLng) {
-        
-        var marker = new google.maps.Marker({
-          position: latLng,
-          map: map,
-          dragable: true,
-          title: "hello"
-        });
-        map.panTo(latLng);
-        
-        marker.id = uniqueId;
-
-        uniqueId ++;
-
-        markers.push(marker);
-
-        // console.log(marker.position.lat());
-
-        // This pops up a window with a marker description and option to delete
-        // marker, calls function 'deleteMarker'
-        google.maps.event.addListener(marker, "rightclick", function (e) {
-                var content = 'Latitude: ' + marker.position.lat() + '<br />Longitude: ' + marker.position.lng();
-                content += "<br />Description:"
-                content += "<br /><input type=text id='markdesc' name = 'markerdescription'>";
-                content += "<input type='button' value='Update' onclick = 'addDescription(" + marker.id + ");' value = 'addDescription' />";
-                content += "<br /><input type = 'button' value = 'Delete Marker' onclick = 'deleteMarker(" + marker.id + ")'; value='deleteMarker'/>";
-                var infoWindow = new google.maps.InfoWindow({
-                    content: content
-                });
-                infoWindow.open(map, marker);
-            });
-      }
-
-
-      // Deletes markers
-      var deleteMarker = function (id) {
-          for (var i = 0; i < markers.length; i++) {
-            if (markers[i].id == id) {
-              markers[i].setMap(null);
-              markers.splice(i, 1);
-              return;
-            }
-          }
-      }
-       
-      // Adds description to marker
-      var addDescription = function(id) {
-
-          for (var i = 0; i < markers.length; i++) {
-              if (markers[i].id == id) {
-                markers[i].description = document.getElementById('markdesc').value;
-                return;
-            }
-      }
-    }
-      
-      //Sets the map on all markers in the array.
-      function setMapOnAll(map) {
-        for (var i = 0; i < markers.length; i++) {
-          console.log(markers[i]);
-          markers[i].setMap(map);
-        }
-      }
-
-      // The function geocodes for a specific address typed-in in the input,
-      // centers the map at the address and creates marker
-      function geocodeAddress(geocoder, resultsMap) {
-        var address = document.getElementById('address').value;
-        geocoder.geocode({'address': address}, function(results, status) {
-          if (status === 'OK') {
-            resultsMap.setCenter(results[0].geometry.location);
-            var marker = new google.maps.Marker({
-              map: resultsMap,
-              position: results[0].geometry.location
-            });
-            // console.log(marker.position.lng());
-
-          } else {
-            alert('Geocode was not successful for the following reason: ' + status);
-          }
-        });
-      }
-
-      document.getElementById('submarker').addEventListener('click', function() {saveRoute(markers); } );
-      // Post data to flask
-      function saveRoute(markers) {
-        event.preventDefault();
-
-        var dataInput = {};
-        console.log(markers);
-        for (var i = 0; i < markers.length; i++) {
-
-            dataInput[markers[i].id] = {
-            "lat": markers[i].position.lat(),
-            "lng": markers[i].position.lng(),
-            "marker_id": markers[i].id,
-            "marker_description": markers[i].description};
-        }
-
-        my_data = {"data": JSON.stringify(dataInput), "trip_code": "{{ trip_code }}"};
-        // console.log(my_data);
-        $.post('/add_marker.json', my_data, function() {alert("You successfully logged this trip")});
-      }
-
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=key&callback=initMap"
-    async defer></script>
-
 </div>
 
 <div>
   <h1> This is the End</h1>
   <h2> Yes it is</h2>
-
 </div>
 
+<!-- Place your scripts here:  -->
+<script type="text/javascript"> 
+var trip_code = "{{ trip_code }}";
+var username = "{{ session['user'] }}";
+
+</script>
+<script src="https://code.jquery.com/jquery.js"></script>
+<script type="text/javascript" src="/static/myscript.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=key&callback=initMap"
+async defer></script>
 
 {% endblock %}

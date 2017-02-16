@@ -213,7 +213,6 @@ def trip_detail(trip_code):
         # Start quering all information for the trip page
         query_user = User.query.get(username)
         query_trip = Trip.query.get(trip_code)
-        query_comment = Comment.query.filter_by(trip_code=trip_code)
         query_list = List.query.filter_by(trip_code=trip_code)
 
         # Query present user name and trip name
@@ -223,47 +222,56 @@ def trip_detail(trip_code):
         # Query all other members for the group
         members = Trip.query.get(trip_code).users
 
-        # Query messages
-        messages = query_comment.all()
-        sorted_messages = sorted(messages, key=lambda x: x.time, reverse=True )
-
         # Query Lists:
         items = query_list.all()
 
-
         # add information for display in the webpage
         return render_template('trip_detail.html', username=username, name=name,
-                    trip_name=trip_name, members=members, messages=sorted_messages,
+                    trip_name=trip_name, members=members,
                     trip_code=trip_code, items=items)
     else:
         flash("You are not logged in. Please do so.")
         return redirect('/')
 
 
-@app.route('/message/<trip_code>', methods=["POST"])
-def commit_message(trip_code):
+@app.route('/message.json/<trip_code>', methods=["GET"])
+def read_message(trip_code):
+    """Queries messages/comments table for all messages for that trip"""
+
+    query_comment = Comment.query.filter_by(trip_code=trip_code)
+    comments = query_comment.all()
+    sorted_messages = sorted(comments, key=lambda x: x.time, reverse=True)
+
+    messages = {}
+
+    for message in sorted_messages:
+        messages[message.comment_id] = {"message": message.comment,
+                                        "user": message.user_id,
+                                        "timestamp": message.time}
+
+    return jsonify(messages)
+
+
+@app.route('/message', methods=["POST"])
+def commit_message():
     """Write messages to server """
 
     username = session['user']
-    print trip_code
-
-    message = request.form.get("mymessage")
+    message = request.form.get("message")
+    trip_code = request.form.get("trip_code")
 
     # Write message to database
-
     my_message = Comment(trip_code=trip_code, user_id=username, comment=message,
                          time=datetime.datetime.now())
     db.session.add(my_message)
     db.session.commit()
     return redirect("/trip_detail/"+trip_code)
 
+
 @app.route('/list/<trip_code>', methods=["POST"])
 def add_to_list(trip_code):
     """Adds items to list table"""
 
-    #print trip_code
-
-    username = session['user']
     list_item = request.form.get("description")
     print list_item
     user_id = request.form.get("userid")
@@ -271,9 +279,7 @@ def add_to_list(trip_code):
     if not completed:
         completed = False
 
-
     # Write list to database
-
     my_list = List(trip_code=trip_code, user_id=user_id, description=list_item,
                         completed=completed)
 
@@ -287,7 +293,9 @@ def add_members_form(trip_code):
     """Option to add members to trip"""
 
     username = session['user']
-    users = User.query.filter(User.user_id != username).all()
+
+    # get users that don't have that trip code 
+    users = User.query.filter(Use.user_id != username).all()
 
     return render_template("add_member.html", users=users, trip_code=trip_code)
 
@@ -296,9 +304,14 @@ def add_members_form(trip_code):
 def add_members(trip_code):
     """Add members to trip """
 
-    users = User.query.all()
+    user_id = request.form.get("memberid")
+    print user_id
 
-    pass
+    new_member = UserTrip(trip_code=trip_code, user_id=user_id)
+    db.session.add(new_member)
+    db.session.commit()
+
+    return redirect("/trip_detail/"+trip_code)
 
 
 @app.route('/add_marker.json/<trip_code>')
@@ -329,21 +342,21 @@ def add_marker_data():
 
     if search_trip:
         for trip in search_trip:
+            print trip
             db.session.delete(trip)
-
-    else:
-        for key in my_markers:
-            print key
-            lat = my_markers[key]['lat']
-            lon = my_markers[key]['lng']
-            desc = my_markers[key].get('marker_description', None)
-
-            marker = Route(trip_code=trip_code, lon=lon, lat=lat, description=desc)
-            db.session.add(marker)
             db.session.commit()
 
-    return redirect("/trip_detail/"+trip_code)
+    for key in my_markers:
+        print key
+        lat = my_markers[key]['lat']
+        lon = my_markers[key]['lng']
+        desc = my_markers[key].get('marker_description', None)
 
+        marker = Route(trip_code=trip_code, lon=lon, lat=lat, description=desc)
+        db.session.add(marker)
+        db.session.commit()
+
+    return redirect("/trip_detail/"+trip_code)
 
 
 if __name__ == "__main__":
@@ -357,5 +370,4 @@ if __name__ == "__main__":
     # Use the DebugToolbar
     DebugToolbarExtension(app)
 
-    
     app.run(port=5000, host='0.0.0.0')
