@@ -62,7 +62,7 @@ class Trip(db.Model):
     trip_code = db.Column(db.String(10), primary_key=True, nullable=False)
     trip_name = db.Column(db.String(60), nullable=False)
     date_created = db.Column(db.DateTime, nullable=False)
-    date_start = db.Column(db.String(50), nullable=True)
+    date_start = db.Column(db.DateTime, nullable=True)
     start_loc = db.Column(db.String(50), nullable=True)
     end_loc = db.Column(db.String(50), nullable=True)
     num_days = db.Column(db.Integer, nullable=True)
@@ -118,15 +118,15 @@ class Comment(db.Model):
         return s % (self.comment_id, self.trip_code, self.user_id, self.time)
 
 
-class List(db.Model):
-    """List table for all trip list items.
+class CheckList(db.Model):
+    """CheckList table for all trip list items.
 
     Each list item will have a item_id, a trip_code that will associate it with
     the trip, a user_id that will associate it to the user who is going to comp-
     lete the task, a description of the list item/task and a completed boolean
     value to check if it has been completed."""
 
-    __tablename__ = "lists"
+    __tablename__ = "checklists"
 
     item_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     trip_code = db.Column(db.String(10), db.ForeignKey('trips.trip_code'), nullable=False)
@@ -135,18 +135,17 @@ class List(db.Model):
     completed = db.Column(db.Boolean, nullable=False)
 
     # Define relationship to trip
-    trip = db.relationship("Trip", backref=db.backref("lists"))
+    trip = db.relationship("Trip", backref=db.backref("checklists"))
 
     # Define relationship to user
-    user = db.relationship("User", backref=db.backref("lists"))
+    user = db.relationship("User", backref=db.backref("checklists"))
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        s = "<List item_id=%s trip_code=%s user_id=%s description=%s completed=%s>"
+        s = "<Checklist item_id=%s trip_code=%s user_id=%s description=%s completed=%s>"
         return s % (self.item_id, self.trip_code, self.user_id, self.description,
                     self.completed)
-
 
 class Geodata(db.Model):
     """Data from maps api with hiking trail information.
@@ -168,7 +167,7 @@ class Geodata(db.Model):
     lon = db.Column(db.Float, nullable=False)
     lat = db.Column(db.Float, nullable=False)
     length = db.Column(db.Integer, nullable=True)
-    park = db.Column(db.String(100), nullable=False)  # make this True
+    park = db.Column(db.String(100), nullable=True)  
     desc = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(250), nullable=True)
     elevation = db.Column(db.Integer, nullable=True)

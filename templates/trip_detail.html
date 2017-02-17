@@ -3,6 +3,10 @@
 {% block title %} 
 <meta name="viewport" content="initial-scale=1.0">
 <meta charset="utf-8">
+<style type="text/css">
+
+
+</style>
 {% endblock %}
 
 {% block content %}
@@ -28,43 +32,58 @@
     <a href="/add_member/{{ trip_code }}">Add members to this trip</a>
 </div>
 
-<div>
-  <h1>Group Communication:</h1>
-  <form id="sendmessage" action="/message/{{ trip_code }}" method="POST">
-    <textarea rows="4" cols="80" id="mytext" name="mymessage"></textarea>
-    <input id="sendbutton" type="submit" value="Send Message" >
+<div id="chatlogs" >
+    <h1>Group Communication:</h1>
   
-   <ul id="message"></ul>
+   <ul id="messages" style="height: 100px; overflow-y: auto">
+    {% for msg in messages %}
+      <li>{{ msg.comment }}</li>
+
+    {% endfor %}
+   </ul>
+<div id="chat-end"></div>
+
+</div>
+
+
+<div>
+  <form id="sendmessage">
+    <textarea rows="4" cols="80" id="mytext" name="mymessage"></textarea>
+    <input id="sendbutton" type="button" value="Send Message" >
   </form>
 </div>
+
+
 
 <div class="list">
   <h1> Your List here</h1>
   <form action="/list/{{ trip_code }}" method="POST">
-    <table>
+    <table class="editabletable" border="1">
       <tr>
-        <tr>Action Items</tr>
-        <tr>Action assigned to</tr>
-        <tr>Completed</tr>
-      </tr><br>
+        <th> Action Items </th>
+        <th>Action Assigned To</th>
+        <th>Completed (Y/N)</th>
+      </tr>
       {% if items %}
       {% for item in items %}
       <tr>
-          <tr>{{ item.description }}</tr>
-          <tr>{{ item.user_id }}</tr>
-          <tr>{{ item.completed }} </tr><br>
+        <td><div contenteditable>{{ item.description }}</div></td>
+        <td><div contenteditable>{{ item.user_id }}</div></td>
+        <td><div contenteditable>{{ item.completed }}</div></td>
       </tr>
       {% endfor %}
       {% endif %}
       <tr>
-          <tr><input type="text" name="description"></tr>
-          <tr><input type="text" name="userid"></tr>
-          <tr><input type="checkbox" name="completed" value="True"></tr>
-          <input type="submit" value="additem"> 
+        <td><input type="text" name="description"></td>
+        <td><input type="text" name="userid"></td>
+        <td><input type="checkbox" name="completed" value="True"></td>
       </tr>
+      <input id="listitem" type='submit' value='Add Item' >
+
     </table>
-    </form>
+  </form>
 </div>
+
 
 <div>
 <h1> Your Maps go here:</h1>
@@ -83,13 +102,17 @@
 
 <!-- Place your scripts here:  -->
 <script type="text/javascript"> 
-var trip_code = "{{ trip_code }}";
-var username = "{{ session['user'] }}";
+var tripCode = "{{ trip_code }}";
+
 
 </script>
 <script src="https://code.jquery.com/jquery.js"></script>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+
 <script type="text/javascript" src="/static/myscript.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=key&callback=initMap"
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCtjaYCg5PDFA51RUUBsgBulbGB0BX9qac&callback=initMap"
 async defer></script>
 
 {% endblock %}

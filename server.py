@@ -4,14 +4,18 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, redirect, request, flash, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 import json
-from model import User, Trip, UserTrip, Comment, List, Geodata, GeodataTrip, Route, connect_to_db, db
+from model import User, Trip, UserTrip, Comment, CheckList, Geodata, GeodataTrip, Route, connect_to_db, db
 import datetime
+from flask_socketio import SocketIO, send, emit, join_room
 
 
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
-app.secret_key = "wonderwall"
+# app.secret_key = "wonderwall"
+
+app.config['SECRET_KEY'] = 'mysecret'
+socketio = SocketIO(app)
 
 # Normally, if you use an undefined variable in Jinja2, it fails
 # silently. This is horrible. Fix this so that, instead, it raises an
@@ -213,7 +217,7 @@ def trip_detail(trip_code):
         # Start quering all information for the trip page
         query_user = User.query.get(username)
         query_trip = Trip.query.get(trip_code)
-        query_list = List.query.filter_by(trip_code=trip_code)
+        query_list = CheckList.query.filter_by(trip_code=trip_code)
 
         # Query present user name and trip name
         name = query_user.first_name
@@ -225,47 +229,84 @@ def trip_detail(trip_code):
         # Query Lists:
         items = query_list.all()
 
+        # query comment
+        query_comment = Comment.query.filter_by(trip_code=trip_code)
+        comments = query_comment.all()
+        sorted_messages = sorted(comments, key=lambda x: x.time, reverse=True)
+
         # add information for display in the webpage
         return render_template('trip_detail.html', username=username, name=name,
                     trip_name=trip_name, members=members,
-                    trip_code=trip_code, items=items)
+                    trip_code=trip_code, items=items, messages=comments)
     else:
         flash("You are not logged in. Please do so.")
         return redirect('/')
 
 
-@app.route('/message.json/<trip_code>', methods=["GET"])
-def read_message(trip_code):
-    """Queries messages/comments table for all messages for that trip"""
+# @app.route('/message.json/<trip_code>', methods=["GET"])
+# def read_message(trip_code):
+#     """Queries messages/comments table for all messages for that trip"""
 
-    query_comment = Comment.query.filter_by(trip_code=trip_code)
-    comments = query_comment.all()
-    sorted_messages = sorted(comments, key=lambda x: x.time, reverse=True)
+#     query_comment = Comment.query.filter_by(trip_code=trip_code)
+#     comments = query_comment.all()
+#     sorted_messages = sorted(comments, key=lambda x: x.time, reverse=True)
 
-    messages = {}
+#     messages = {}
 
-    for message in sorted_messages:
-        messages[message.comment_id] = {"message": message.comment,
-                                        "user": message.user_id,
-                                        "timestamp": message.time}
+#     for message in sorted_messages:
+#         messages[message.comment_id] = {"message": message.comment,
+#                                         "user": message.user_id,
+#                                         "timestamp": message.time}
 
-    return jsonify(messages)
+#     return jsonify(messages)
 
 
-@app.route('/message', methods=["POST"])
-def commit_message():
-    """Write messages to server """
+# @app.route('/message', methods=["POST"])
+# def commit_message():
+#     """Write messages to server """
+
+#     username = session['user']
+#     message = request.form.get("message")
+#     trip_code = request.form.get("trip_code")
+
+#     # Write message to database
+#     my_message = Comment(trip_code=trip_code, user_id=username, comment=message,
+#                          time=datetime.datetime.now())
+#     db.session.add(my_message)
+#     db.session.commit()
+#     return redirect("/trip_detail/"+trip_code)
+
+@socketio.on('join')
+def on_join(room):
+    join_room(room)
+
+    print 'joined room %s' % room
+
+    user_name = session['user']
+    emit('message', user_name + ' has entered the room.', room=room)
+
+
+@socketio.on('json')
+def handleMessage(msg):
+    # print ('Message: ' + msg)
 
     username = session['user']
-    message = request.form.get("message")
-    trip_code = request.form.get("trip_code")
 
-    # Write message to database
-    my_message = Comment(trip_code=trip_code, user_id=username, comment=message,
+    # message = request.form.get("message")
+    # trip_code = request.form.get("trip_code")
+
+    print msg['room']
+
+    print username
+
+    my_message = Comment(trip_code=msg['room'], user_id=username, comment=msg["msg"],
                          time=datetime.datetime.now())
     db.session.add(my_message)
     db.session.commit()
-    return redirect("/trip_detail/"+trip_code)
+
+    # emit('message', msg['msg'], room=msg['room'])
+
+    send(msg['msg'], room=msg['room'])
 
 
 @app.route('/list/<trip_code>', methods=["POST"])
@@ -280,7 +321,7 @@ def add_to_list(trip_code):
         completed = False
 
     # Write list to database
-    my_list = List(trip_code=trip_code, user_id=user_id, description=list_item,
+    my_list = CheckList(trip_code=trip_code, user_id=user_id, description=list_item,
                         completed=completed)
 
     db.session.add(my_list)
@@ -293,9 +334,19 @@ def add_members_form(trip_code):
     """Option to add members to trip"""
 
     username = session['user']
+    user_set = set()
 
-    # get users that don't have that trip code 
-    users = User.query.filter(Use.user_id != username).all()
+    # Query all users for the trip
+
+    # query_users = UserTrip.query.filter(UserTrip.trip_code == trip_code).all()
+
+    # for user in query_users:
+    #     user_set.update(user)
+
+    # print user_set
+
+    # get users that don't have that trip code
+    users = User.query.filter(User.user_id != username).all()
 
     return render_template("add_member.html", users=users, trip_code=trip_code)
 
@@ -359,6 +410,7 @@ def add_marker_data():
     return redirect("/trip_detail/"+trip_code)
 
 
+
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension
@@ -370,4 +422,5 @@ if __name__ == "__main__":
     # Use the DebugToolbar
     DebugToolbarExtension(app)
 
-    app.run(port=5000, host='0.0.0.0')
+    # app.run(port=5000, host='0.0.0.0')
+    socketio.run(app, port=5000, host='0.0.0.0')
