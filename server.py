@@ -288,16 +288,16 @@ def on_join(room):
 
 @socketio.on('json')
 def handleMessage(msg):
+    """This uses sockeio to receive a message object from client (input text)
+    with message and room. Writes message to database table and sends the
+    message back to client
+    """
     # print ('Message: ' + msg)
 
     username = session['user']
 
-    # message = request.form.get("message")
-    # trip_code = request.form.get("trip_code")
-
-    print msg['room']
-
-    print username
+    # print msg['room']
+    # print username
 
     my_message = Comment(trip_code=msg['room'], user_id=username, comment=msg["msg"],
                          time=datetime.datetime.now())
@@ -305,7 +305,6 @@ def handleMessage(msg):
     db.session.commit()
 
     # emit('message', msg['msg'], room=msg['room'])
-
     send(msg['msg'], room=msg['room'])
 
 
@@ -337,18 +336,18 @@ def add_members_form(trip_code):
     user_set = set()
 
     # Query all users for the trip
+    query_users = UserTrip.query.filter(UserTrip.trip_code == trip_code).all()
 
-    # query_users = UserTrip.query.filter(UserTrip.trip_code == trip_code).all()
-
-    # for user in query_users:
-    #     user_set.update(user)
-
-    # print user_set
+    for user in query_users:
+        user_set.add(user.user_id)
+        print user.user_id
 
     # get users that don't have that trip code
-    users = User.query.filter(User.user_id != username).all()
+    all_users = User.query.all()
 
-    return render_template("add_member.html", users=users, trip_code=trip_code)
+
+    return render_template("add_member.html", users=all_users, user_set=user_set,
+                            trip_code=trip_code)
 
 
 @app.route('/add_member/<trip_code>', methods=["POST"])
@@ -423,4 +422,5 @@ if __name__ == "__main__":
     DebugToolbarExtension(app)
 
     # app.run(port=5000, host='0.0.0.0')
+    # for websockets use the socketio.run instead of app.run
     socketio.run(app, port=5000, host='0.0.0.0')

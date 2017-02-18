@@ -38,6 +38,7 @@ class User(db.Model):
 
     # Create relationship to trip data through users_trips table
     trips = db.relationship("Trip", secondary="users_trips", backref="users")
+    usertrip = db.relationship("UserTrip", backref="users")
 
     def __repr__(self):
         """ Provide helpful representation when printed."""

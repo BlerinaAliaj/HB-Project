@@ -7,9 +7,12 @@
     <form action="/add_member/{{ trip_code }}" method="POST">
         Member ID: <select id="memberid" name="memberid">
                     {% for user in users %}
+                    {% if user.user_id not in user_set %}
                     <option value={{user.user_id}}>{{user.user_id}}, {{ user.first_name }} {{ user.last_name }}</option>
 
+                    {% endif %}
                     {% endfor %}
+
 
                    </select>
         
