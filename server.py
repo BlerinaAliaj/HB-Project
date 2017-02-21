@@ -27,12 +27,18 @@ app.jinja_env.undefined = StrictUndefined
 def index():
     """Homepage."""
 
+    if "user" in session:
+        return redirect("/profile")
+
     return render_template("homepage.html")
 
 
 @app.route('/login', methods=["GET"])
 def login_page():
     """Page that asks users for login information"""
+
+    if "user" in session:
+        return redirect("/profile")
 
     return render_template("login.html")
 
@@ -74,6 +80,9 @@ def login():
 def register_page():
     """Page that asks users for login information"""
 
+    if "user" in session:
+        return redirect("/profile")
+
     return render_template("register.html")
 
 
@@ -82,6 +91,7 @@ def register():
     """Sends user to registration page."""
 
     username = request.form.get('username')
+    print "my username is %s" % username
     firstname = request.form.get('firstname')
     lastname = request.form.get('lastname')
     email = request.form.get('email')
