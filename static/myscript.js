@@ -1,72 +1,9 @@
-// This script links to trip_detail.html
+// This script links to trip_detail.html and updates/loads maps, markers, routes
+// The interactive tables are inputed here
+
 var map;
 var uniqueId = 0;
 var markers = [];
-
-//JQuery to update messages\\
-
-
-$(document).ready(function() {
-
-  var socket = io.connect('127.0.0.1:5000');
-
-  socket.on('connect', function () {
-    console.log("connected and about to join room %s", tripCode);
-    console.log(socket);
-    socket.emit('join', tripCode);
-  });
-
-  // socket.on('connect', function () {
-  //   console.log('User has connected!'); });
-
-  //   // socket.send('User has connected!'); });
-
-  socket.on('message', function(msg) {
-    $("#messages").append('<li>' + msg + '</li>');
-    console.log('Received message');
-  });
-
-  $('#sendbutton').on('click', function() {
-    socket.emit('json', { "msg": $("#mytext").val(), "room": tripCode});
-    $("#mytext").val(''); }); });
-
-
-
-
-// $.get("/message.json/"+trip_code, updateMessage);
-
-// function updateMessage(data) {
-//   if (data) {
-//     for (var key in data) {
-//       var message = data[key].message;
-//       var user = data[key].user;
-//       var time = data[key].timestamp;
-//       $("#message").append("<li>"+ message + ", sent by: "+ user + "</li>");
-
-//     }
-//   } else {
-//     $("#message").append("<li> No messages Logged Yet.</li>");
-//   }
-// }
-
-// function sendMessage(evt){
-//   evt.preventDefault();
-
-//   var newMessage = $("#mytext").val();
-//   console.log(newMessage);
-//   messages = { "message": newMessage,
-//                "trip_code":  trip_code};
-
-//   $.post("/message", messages, function() { $("#mytext").val("");
-//     $("#message").append("<li>"+ newMessage + ", sent by: " +username+ "</li>"); });
-// }
-
-// $("#sendmessage").on('submit', sendMessage);
-
-
-// setInterval(function(){
-//     $.get("/message.json/"+trip_code, updateMessage); // this will run after every 1 seconds
-// }, 1000);
 
 function init() {
   var tables = document.getElementsByClassName("editabletable");
@@ -124,10 +61,10 @@ function getCellElement(table, row, col) {
     return table.rows[row].cells[col].firstChild;
 }
 
-function split(str) {
-    // use comma and whitespace as delimiters
-    return str.split(/,|\s|<br>/);
-}
+// function split(str) {
+//     // use comma and whitespace as delimiters
+//     return str.split(/,|\s|<br>/);
+// }
 
 init();
 
@@ -136,7 +73,7 @@ init();
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 37.774, lng: -122.431},
-    zoom: 10,
+    zoom: 15,
     mapTypeId: 'terrain'
    
   });

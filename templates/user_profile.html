@@ -1,19 +1,65 @@
 {% extends 'base.html' %}
 {% block content %}
 
-    <h2> Hello {{ name }} </h2>
+<h2> Hello {{ name }} </h2>
 
-    <a href="/new_trip">Create New Trip</a>
+<a id="mylink" href="/new_trip">Create New Trip</a>
 
-    <p>This is a list of your most recent trips:</p>
+<div class="col-xs-12" style="display:none">
+  <h1>Please fill out information about your trip below:</h1>
+  <form class="tripform" action="/new_trip" method="POST">
+  Trip Name: <input id="tripn" type="text" name="tripname"><br>
+  Start Date: <input id="sdate" type="date" name="datestart"><br>
+  Number of Days: <input id="numdays" type="number" name="numdays"><br>
+  <input type="submit" value="submit"><br>
+  <input id="minimize" type="button" value="Minimize">
+  </form>
+</div>
+<div>
+  <p>This is a list of your most recent trips:</p>
+  <ul >
+    {% for trip in trips %}
+        <li id="new_trip">
+            <a href="/trip_detail/{{ trip.trip_code }}">
+              {{ trip.trip_name }}</a> 
+        </li>
+    {% endfor %}
+  </ul>
+</div>
+<script src="https://code.jquery.com/jquery.js"></script>
+<script>
+// This scrip creates new trip
+$("#mylink").on("click", function(evt) {
+  evt.preventDefault();
+  $(".col-xs-12").attr("style", "display:inline");
 
-    <ul>
-      {% for trip in trips %}
-          <li>
-              <a href="/trip_detail/{{ trip.trip_code }}">
-                {{ trip.trip_name }}</a> 
-          </li>
-      {% endfor %}
-    </ul>
+});
 
+$("#minimize").on("click", function(evt) {
+  $(".col-xs-12").attr("style", "display:none");
+});
+
+$(".tripform").on('submit', submitTrip)
+
+function submitTrip(evt) {
+  evt.preventDefault();
+  // var tripcode = $("#tripc").val()
+  var tripname = $("#tripn").val()
+  tripData = {"tripname": $("#tripn").val(),
+              "datestart": $("#sdate").val(),
+              "numdays": $("#numdays").val()}
+
+
+  // var new_line = "<li><a href='/trip_detail/"+tripCode+"'>"+tripname+"</a></li>";
+  $.post("/new_trip", tripData, function(response) { 
+    my_response = JSON.parse(response)
+    console.log(my_response);
+    tripCode = my_response["tripCode"];
+    console.log(response);
+    console.log(tripCode);
+    var new_line = "<li><a href='/trip_detail/"+tripCode+"'>"+tripname+"</a></li>";
+    $("#new_trip").before(new_line) ;});
+}
+
+</script>
 {% endblock %}

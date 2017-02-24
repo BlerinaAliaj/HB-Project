@@ -74,30 +74,30 @@ if __name__ == "__main__":
                  email='henry@gmail.com', password='henry', zipcode='94117')
 
     # Add Trips
-    yos = Trip(trip_code='yos0', trip_name='Yosemite Winter Backpacking',
+    yos = Trip(trip_code='yose000', trip_name='Yosemite Winter Backpacking',
                     date_created=datetime.datetime.now())
-    bv = Trip(trip_code='bear0', trip_name='Bear Valley Winter Backpacking',
+    bv = Trip(trip_code='bear000', trip_name='Bear Valley Winter Backpacking',
                     date_created=datetime.datetime.now())
-    kc = Trip(trip_code='king0', trip_name='King Canyon Summer Backpacking',
+    kc = Trip(trip_code='king000', trip_name='King Canyon Summer Backpacking',
                     date_created=datetime.datetime.now())
 
-    trip1 = UserTrip(trip_code='yos0', user_id='eagle5')
-    trip2 = UserTrip(trip_code='bear0', user_id='eagle5')
-    trip3 = UserTrip(trip_code='king0', user_id='eagle5')
+    trip1 = UserTrip(trip_code='yose000', user_id='eagle5')
+    trip2 = UserTrip(trip_code='bear000', user_id='eagle5')
+    trip3 = UserTrip(trip_code='king000', user_id='eagle5')
 
-    trip4 = UserTrip(trip_code='yos0', user_id='souali')
-    trip5 = UserTrip(trip_code='bear0', user_id='souali')
-    trip6 = UserTrip(trip_code='king0', user_id='souali')
+    trip4 = UserTrip(trip_code='yose000', user_id='souali')
+    trip5 = UserTrip(trip_code='bear000', user_id='souali')
+    trip6 = UserTrip(trip_code='king000', user_id='souali')
 
-    trip7 = UserTrip(trip_code='yos0', user_id='hlin')
-    trip8 = UserTrip(trip_code='bear0', user_id='hlin')
-    trip9 = UserTrip(trip_code='king0', user_id='hlin')
+    trip7 = UserTrip(trip_code='yose000', user_id='hlin')
+    trip8 = UserTrip(trip_code='bear000', user_id='hlin')
+    trip9 = UserTrip(trip_code='king000', user_id='hlin')
 
-    mess1 = Comment(trip_code='yos0', user_id='eagle5', comment="We should take my car",
+    mess1 = Comment(trip_code='yose000', user_id='eagle5', comment="We should take my car",
                     time=datetime.datetime.now())
-    mess2 = Comment(trip_code='yos0', user_id='hlin', comment="Great idea!!!!",
+    mess2 = Comment(trip_code='yose000', user_id='hlin', comment="Great idea!!!!",
                     time=datetime.datetime.now())
-    mess3 = Comment(trip_code='yos0', user_id='souali', comment="Who's driving?",
+    mess3 = Comment(trip_code='yose000', user_id='souali', comment="Who's driving?",
                     time=datetime.datetime.now())
 
 

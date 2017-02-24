@@ -5,13 +5,13 @@
 <div class="col-xs-6">
     <h1>User Login</h1>
 
-    <form action="/login" method="POST">
-        User Name: <input type="text" name="username"><br>
-        Password: <input type="password" name="password"><br>
+    <form id="userlogin" action="/login" method="POST">
+        User Name: <input id="uname" type="text" name="username" required><br>
+        Password: <input id="pwd" type="password" name="password" required><br>
         <input type="submit" value="Submit"><br>
     </form>
 </div>
-
-
+<script src="https://code.jquery.com/jquery.js"></script>
+<script type="text/javascript" src="/static/credentials.js"></script>
 
 {% endblock %} 

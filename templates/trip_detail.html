@@ -57,28 +57,32 @@
 
 <div class="list">
   <h1> Your List here</h1>
-  <form action="/list/{{ trip_code }}" method="POST">
+  <form class="updateList" action="/list/{{ trip_code }}" method="POST">
     <table class="editabletable" border="1">
-      <tr>
-        <th> Action Items </th>
-        <th>Action Assigned To</th>
-        <th>Completed (Y/N)</th>
-      </tr>
-      {% if items %}
-      {% for item in items %}
-      <tr>
-        <td><div contenteditable>{{ item.description }}</div></td>
-        <td><div contenteditable>{{ item.user_id }}</div></td>
-        <td><div contenteditable>{{ item.completed }}</div></td>
-      </tr>
-      {% endfor %}
-      {% endif %}
-      <tr>
-        <td><input type="text" name="description"></td>
-        <td><input type="text" name="userid"></td>
-        <td><input type="checkbox" name="completed" value="True"></td>
-      </tr>
-      <input id="listitem" type='submit' value='Add Item' >
+      <tbody>
+        <tr id='header'>
+          <td> Action Items </td>
+          <td>Action Assigned To</td>
+          <td>Completed (Y/N)</td>
+        </tr>
+        {% if items %}
+        {% for item in items %}
+        <tr id="{{ item.item_id }}">
+          <td><div id='desc' contenteditable>{{ item.description }}</div></td>
+          <td><div id='usid' contenteditable>{{ item.user_id }}</div></td>
+          <td><div id='comp' contenteditable>{{ item.completed }}</div></td>
+          <!-- <td><input id='comp' type="checkbox" name="comp" value="{{ item.completed }}">{{ item.completed }}</td> -->
+        </tr>
+        {% endfor %}
+        {% endif %}
+        <tr id="addItem">
+          <td><input id="indesc" type="text" name="description"></td>
+          <td><input id="inusid" type="text" name="userid"></td>
+          <td><input id="incomp" type="checkbox" name="completed"></td>
+        </tr>
+      </tbody>
+      <input id="listitem" type='submit' value='Update List' >
+
 
     </table>
   </form>
@@ -101,18 +105,81 @@
 </div>
 
 <!-- Place your scripts here:  -->
+
+
+<script src="https://code.jquery.com/jquery.js"></script>
 <script type="text/javascript"> 
 var tripCode = "{{ trip_code }}";
 
+
+
+function submitList(evt) {
+  
+  evt.preventDefault();
+  var allList = {};
+  var allData = {};
+  var rowId;
+  var desc; 
+  var usid;
+  var comp;
+
+  allList["tripCode"] = tripCode;
+
+  $(".editabletable tr").each(function(){
+
+      rowId = $(this).attr('id');
+      // console.log(rowId);
+
+      if (rowId === "addItem") {
+        $('#'+rowId).each(function() {
+        desc = $(this).find('#indesc').val();
+        usid = $(this).find('#inusid').val();
+        comp = $(this).find('#incomp').is(":checked");
+
+        // console.log(comp);
+
+        allData[rowId] = {"description": desc,
+                        "userid": usid,
+                        "completed": comp} 
+      });
+      } else {
+
+        $('#'+rowId).each(function() {
+        desc = $(this).find('#desc').text();
+        usid = $(this).find('#usid').text();
+        comp = $(this).find('#comp').text(); 
+        console.log(comp);
+
+        allData[rowId] = {"description": desc,
+                        "userid": usid,
+                        "completed": comp} 
+      });
+    }
+  });
+
+  allList['allData'] = JSON.stringify(allData);
+  console.log(allList);
+
+  $.post("/list.json", allList, function(){ alert("it worked"); });
+}
+
+
+// function addRow() {
+
+// }
+
+$(".updateList").on('submit', submitList);
+// $(".updateList").on('return', addRow)
 
 </script>
 <script src="https://code.jquery.com/jquery.js"></script>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
-
 <script type="text/javascript" src="/static/myscript.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=key&callback=initMap"
+<script type="text/javascript" src="/static/chat.js"></script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap"
 async defer></script>
 
 {% endblock %}

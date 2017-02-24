@@ -47,11 +47,10 @@ def login_page():
 def login():
     """Verifies that user login exists."""
 
-    if "user" not in session:
-        session["user"] = {}
-
     username = request.form.get('username')
     password = request.form.get('password')
+    # print username
+    # print password
 
     query_user = User.query.filter_by(user_id=username).first()
 
@@ -61,7 +60,6 @@ def login():
         if password == user_pass:
             # We add user id and password to sessions user dictionary
             session["user"] = query_user.user_id
-            user_id = query_user.user_id
             flash('You have successfully logged in.')
             return redirect("/profile")
             # return redirect('/user_detail/' + str(user_id))
@@ -184,18 +182,33 @@ def create_trip():
 
     if 'user' in session:
         username = session['user']
-        trip_code = request.form.get('tripcode')
+        # trip_code = request.form.get('tripcode')
         trip_name = request.form.get('tripname')
         date_created = datetime.datetime.now()
         date_start = request.form.get('datestart')
-        start_loc = request.form.get('startloc')
-        end_loc = request.form.get('endloc')
+        # start_loc = request.form.get('startloc')
+        # end_loc = request.form.get('endloc')
         num_days = int(request.form.get('numdays'))
+
+        # Generate trip code here:
+        trip_abbr = trip_name[:4].lower()
+        print trip_abbr
+        query_trips = Trip.query.all()
+
+        for trip in query_trips:
+            if trip.trip_code[:4] == trip_abbr:
+
+                appx = int(trip.trip_code[4:])
+                appx += 1
+                trip_code = trip_abbr + format(appx, "03")
+                print trip_code
+                break
+            else:
+                trip_code = trip_abbr + "000"
 
         # write new trip object to database:
         new_trip = Trip(trip_code=trip_code, trip_name=trip_name, date_created=date_created,
-                       date_start=date_start, start_loc=start_loc, end_loc=end_loc,
-                       num_days=num_days)
+                       date_start=date_start, num_days=num_days)
         new_trip_log = UserTrip(trip_code=trip_code, user_id=username)
 
         # add trip objects to database and commit
@@ -205,7 +218,8 @@ def create_trip():
         db.session.commit()
 
         # return redirect('/profile')
-        return redirect('/trip_detail/'+trip_code)
+        return json.dumps({'status': 'ok', 'user': username, 'tripCode': trip_code})
+        # return redirect('/trip_detail/'+trip_code)
     else:
         flash("You are not logged in. Please do so.")
         return redirect('/')
@@ -227,7 +241,7 @@ def trip_detail(trip_code):
         # Start quering all information for the trip page
         query_user = User.query.get(username)
         query_trip = Trip.query.get(trip_code)
-        query_list = CheckList.query.filter_by(trip_code=trip_code)
+        query_list = CheckList.query.filter_by(trip_code=trip_code).order_by(CheckList.item_id)
 
         # Query present user name and trip name
         name = query_user.first_name
@@ -318,24 +332,77 @@ def handleMessage(msg):
     send(msg['msg'], room=msg['room'])
 
 
-@app.route('/list/<trip_code>', methods=["POST"])
-def add_to_list(trip_code):
+@app.route('/list.json', methods=["POST"])
+def add_to_list():
     """Adds items to list table"""
 
-    list_item = request.form.get("description")
-    print list_item
-    user_id = request.form.get("userid")
-    completed = request.form.get("completed")
-    if not completed:
-        completed = False
+    trip_code = request.form.get('tripCode')
+    print trip_code
 
-    # Write list to database
-    my_list = CheckList(trip_code=trip_code, user_id=user_id, description=list_item,
-                        completed=completed)
+    all_data = request.form.get('allData')
+    data = json.loads(all_data)
+    print all_data
+    print data
 
-    db.session.add(my_list)
-    db.session.commit()
+    for key in data:
+        if key == "addItem":
+            # We write new items to database
+            user_id = data[key]["userid"]
+            list_item = data[key]["description"]
+            completed = data[key]["completed"]
+            print completed
+
+            if not completed:
+                completed = False
+
+            if list_item and user_id: 
+
+                my_list = CheckList(trip_code=trip_code, user_id=user_id, description=list_item,
+                            completed=completed)
+
+                db.session.add(my_list)
+                db.session.commit()
+
+        elif key != "header":
+            # We check to see if key is in database table and rewrite the values
+            user_id = data[key]["userid"]
+            list_item = data[key]["description"]
+            completed = data[key]["completed"]
+
+            # query list for the list id
+            query_list = CheckList.query.get(key)
+
+            query_list.user_id = user_id
+            query_list.description = list_item
+            query_list.completed = completed
+            db.session.commit()
+
+    # return trip_code
+
     return redirect("/trip_detail/"+trip_code)
+
+
+
+
+
+# @app.route('/list/<trip_code>', methods=["POST"])
+# def add_to_list(trip_code):
+#     """Adds items to list table"""
+
+#     list_item = request.form.get("description")
+#     print list_item
+#     user_id = request.form.get("userid")
+#     completed = request.form.get("completed")
+#     if not completed:
+#         completed = False
+
+#     # Write list to database
+#     my_list = CheckList(trip_code=trip_code, user_id=user_id, description=list_item,
+#                         completed=completed)
+
+#     db.session.add(my_list)
+#     db.session.commit()
+#     return redirect("/trip_detail/"+trip_code)
 
 
 @app.route('/add_member/<trip_code>', methods=["GET"])

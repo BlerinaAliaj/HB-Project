@@ -2,3 +2,6 @@ env/
 *.pyc
 test.py
 seed.py
+.DS_Store
+california-latest.osm.pbf
+server_2.py
