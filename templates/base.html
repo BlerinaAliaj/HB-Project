@@ -2,24 +2,46 @@
 <html>
 <head>
   <title>{% block title %}Hiker App{% endblock %}</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
+  
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/style.css" rel="stylesheet">
 
 </head>
 
 <body>
-  <div>
-    </form>
-      <ul class="nav navbar-nav navbar-right">
-        {% if 'user' in session %}
 
-          <li><a href="/profile">Member Home Page</li>    
-          <li><a href="/logout">Logout</a></li>
-    
-        {% endif %}
-      </ul>
-  </div>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">My Icon Here</a>
+      </div>
 
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        
+        <ul class="nav navbar-nav navbar-right">
+          {% if 'user' in session %}
+            <li><a href="/profile">Member Profile</a></li>    
+            <li><a href="/logout">Logout</a></li>  
+          {% else %}
+            <form class="navbar-form navbar-right" action="/login" method="POST">
+              <div class="form-group">
+                <input id="uname" type="text" class="form-control" placeholder="User Name" name='username'>
+                <input id="pwd" type="password" class="form-control" placeholder="Password" name='password'>
+              </div>
+              <button type="submit" class="btn btn-default">Login</button>
+            </form>  
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
 
   <div class="container-fluid">
     <ul>
@@ -29,9 +51,9 @@
     </ul>
 
 
-  {% block content %} put your content here {% endblock %}
+    {% block content %} put your content here {% endblock %}
   </div>
-
 <script src="https://code.jquery.com/jquery.js"></script>
+<script type="text/javascript" src="/static/credentials.js"></script>
 </body>
 </html>

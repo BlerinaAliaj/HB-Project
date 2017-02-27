@@ -1,9 +1,8 @@
 // This script links to trip_detail.html and updates/loads maps, markers, routes
 // The interactive tables are inputed here
 
-var map;
-var uniqueId = 0;
-var markers = [];
+// *****************************************************************************
+//  Js for tables
 
 function init() {
   var tables = document.getElementsByClassName("editabletable");
@@ -68,8 +67,15 @@ function getCellElement(table, row, col) {
 
 init();
 
-
+// *****************************************************************************
+// JS for Google Maps
 // The function initializes the map with origin on San Francisco
+
+var map;
+var uniqueId = 0;
+var markers = [];
+var timeout;
+
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 37.774, lng: -122.431},
@@ -89,6 +95,11 @@ function initMap() {
   // calls in function placeMarkerAndPanTo on double click action
   map.addListener('dblclick', function(evt) {
     placeMarkerAndPanTo(evt.latLng); });
+
+  map.addListener('bounds_changed', function () {
+    clearTimeout(timeout);
+    timeout = setTimeout(queryGISDatabase.bind(null, map), 1000);
+  });
 }
 
 // Function that check to see if there are any markers. IIFE used to make sure 
@@ -180,6 +191,9 @@ function geocodeAddress(geocoder, resultsMap) {
   geocoder.geocode({'address': address}, function(results, status) {
     if (status === 'OK') {
       resultsMap.setCenter(results[0].geometry.location);
+
+      queryGISDatabase(resultsMap);
+
       // The 4 lines below place a marker when Geocode btn is clicked; removed
       // it to make it less confusing
       // var marker = new google.maps.Marker({
@@ -212,4 +226,44 @@ function saveRoute(markers) {
   // console.log(my_data);
   $.post('/add_marker.json', my_data, function() {alert("You successfully logged this trip");});
 }
+
+function queryGISDatabase(resultsMap) {
+
+  // Clear Bounds
+
+
+
+  // get values for viewport
+  var latNE = resultsMap.getBounds().getNorthEast().lat();
+  var lngNE = resultsMap.getBounds().getNorthEast().lng();
+  var latSW = resultsMap.getBounds().getSouthWest().lat();
+  var lngSW = resultsMap.getBounds().getSouthWest().lng();
+
+  console.log(latNE, lngNE, latSW, lngSW);
+
+  var myViewPort = {'latNE': latNE, 'lngNE': lngNE, 'latSW': latSW, 'lngSW': lngSW };
+
+  // Push viewport data to server route that will filter database tables 
+  // based on viewport
+  $.get("/query_osm.json", myViewPort, function(gisDataJSON){
+    console.log(gisData);
+    
+    map.data.forEach(function (feature) {
+      map.data.remove(feature);
+    });
+
+  // mapSettleTime();
+
+    var gisData = JSON.parse(gisDataJSON);
+    for (var key in gisData) {
+      console.log("Adding: %s", JSON.stringify(gisData[key]));
+      map.data.addGeoJson(gisData[key]);
+    }
+    // alert("Yay");
+  });
+}
+
+
+
+
 

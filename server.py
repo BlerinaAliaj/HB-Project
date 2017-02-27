@@ -7,7 +7,8 @@ import json
 from model import User, Trip, UserTrip, Comment, CheckList, Geodata, GeodataTrip, Route, connect_to_db, db
 import datetime
 from flask_socketio import SocketIO, send, emit, join_room
-
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
 
 app = Flask(__name__)
 
@@ -21,6 +22,11 @@ socketio = SocketIO(app)
 # silently. This is horrible. Fix this so that, instead, it raises an
 # error.
 app.jinja_env.undefined = StrictUndefined
+
+# Create connection to my 'gis' database
+
+gis_db = create_engine('postgresql:///gis2')
+GISSession = sessionmaker(gis_db)
 
 
 @app.route('/')
@@ -258,9 +264,19 @@ def trip_detail(trip_code):
         comments = query_comment.all()
         sorted_messages = sorted(comments, key=lambda x: x.time, reverse=True)
 
+        # query trips and show them in reverse chronological order
+        trips = query_user.trips
+
+        # use the sorted built-in function with lamda function where the key
+        # we are using to sort by is the date trip was created. Will reverse
+        # list to show latest trip first
+        sorted_trips = sorted(trips, key=lambda x: x.date_created, reverse=True)
+
+
+
         # add information for display in the webpage
         return render_template('trip_detail.html', username=username, name=name,
-                    trip_name=trip_name, members=members,
+                    trip_name=trip_name, members=members, trips=sorted_trips,
                     trip_code=trip_code, items=items, messages=comments)
     else:
         flash("You are not logged in. Please do so.")
@@ -486,6 +502,61 @@ def add_marker_data():
     return redirect("/trip_detail/"+trip_code)
 
 
+@app.route('/query_osm.json')
+def query_osm_on_viewport():
+    """Queries osm databased based on viewport, returns all ways within the viewport"""
+
+    gis_session = GISSession()
+
+    latNE = request.args.get('latNE')
+    lngNE = request.args.get('lngNE')
+    latSW = request.args.get('latSW')
+    lngSW = request.args.get('lngSW')
+
+    sql = """SELECT name, ST_AsGeoJSON(way) AS geo_json
+                FROM planet_osm_line
+                    WHERE (
+                        way && ST_MakeEnvelope(:lngSW, :latSW, :lngNE, :latNE, 4326)
+                        OR
+                        way ~ ST_MakeEnvelope(:lngSW, :latSW, :lngNE, :latNE, 4326)
+                        OR 
+                        way @ ST_MakeEnvelope(:lngSW, :latSW, :lngNE, :latNE, 4326)
+                    )
+             UNION
+             SELECT name, ST_AsGeoJSON(way) AS geo_json
+                FROM planet_osm_roads
+                    WHERE (
+                        way && ST_MakeEnvelope(:lngSW, :latSW, :lngNE, :latNE, 4326)
+                        OR
+                        way ~ ST_MakeEnvelope(:lngSW, :latSW, :lngNE, :latNE, 4326)
+                        OR 
+                        way @ ST_MakeEnvelope(:lngSW, :latSW, :lngNE, :latNE, 4326)
+                    )
+          """
+
+    # sql = """SELECT node_id
+
+    all_nodes = gis_session.execute(sql, {'lngSW': lngSW,
+                             'latSW': latSW,
+                             'lngNE': lngNE,
+                             'latNE': latNE})
+
+    nodes = all_nodes.fetchall()
+
+    print nodes
+
+    my_gis_data = {}
+
+    for trail_name, geo_json in nodes:
+        my_gis_data[trail_name] = {
+            'type': "Feature",
+            'geometry': json.loads(geo_json),
+            'properties': {
+                'name': trail_name
+            }
+        }
+
+    return json.dumps(my_gis_data)
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

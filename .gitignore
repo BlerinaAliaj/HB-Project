@@ -5,3 +5,5 @@ seed.py
 .DS_Store
 california-latest.osm.pbf
 server_2.py
+california-hiking.osm.pbf
+californiaGIS.sql

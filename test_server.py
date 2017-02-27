@@ -2,7 +2,7 @@
 
 1. Test Home page - done
 2. Test Login page - done
-3. Test Registration page
+3. Test Registration page - done
 4. Test Logout Page - done
 5. Test Profile
 6. Test New Trip page
@@ -54,6 +54,46 @@ class FlaskTests(unittest.TestCase):
         self.assertNotIn("Logout", result.data)
         self.assertNotIn("Member Home Page", result.data)
 
+
+    def test_registration_page(self):
+        """Tests registration page"""
+
+        result = self.client.get("/register")
+        self.assertIn("User Name", result.data)
+        self.assertIn("First Name", result.data)
+        self.assertIn("Last Name", result.data)
+        self.assertIn("Email", result.data)
+        self.assertIn("Password", result.data)
+        self.assertIn("Zip Code", result.data)
+        self.assertNotIn("Member Home Page", result.data)
+        self.assertNotIn("Logout", result.data)
+
+    # def test_registration(self):
+    #     """ Tests registration procedure"""
+
+    #     with self.client as c:
+
+    #         result = c.post("/register", data={'username': "baliaj", 
+    #             'firstname': 'Blerina', 'lastname': "Aliaj", 'email': "baliaj@yahoo.com",
+    #                         "password": "blerina", 'zipcode': '94115'}, follow_redirects=True)
+    #         print session['user']
+    #         self.assertEqual(session['user'], 'baliaj')
+    #         self.assertIn("Hello Blerina", result.data)
+    #         self.assertIn("Create New Trip", result.data)
+    #         self.assertIn("This is a list of your most recent trips:", result.data)
+    #         self.assertIn("Member Home Page", result.data)
+    #         self.assertIn("Logout", result.data)
+
+
+    def test_profile(self):
+
+        result = self.client.get('/profile')
+        self.assertIn("Redirecting", result.data)
+        # self.assertIn("Register", result.data)
+        # self.assertNotIn("Member Home Page", result.data)
+
+        # self.assertIn("This is a list of your most recent trips:", result.data)
+
     def test_login(self):
         """ Tests login procedure"""
 
@@ -69,28 +109,6 @@ class FlaskTests(unittest.TestCase):
             self.assertIn("This is a list of your most recent trips:", result.data)
             self.assertIn("Member Home Page", result.data)
             self.assertIn("Logout", result.data)
-
-    def test_registration(self):
-        """Tests registration page"""
-
-        result = self.client.get("/register")
-        self.assertIn("User Name", result.data)
-        self.assertIn("First Name", result.data)
-        self.assertIn("Last Name", result.data)
-        self.assertIn("Email", result.data)
-        self.assertIn("Password", result.data)
-        self.assertIn("Zip Code", result.data)
-        self.assertNotIn("Member Home Page", result.data)
-        self.assertNotIn("Logout", result.data)
-
-    def test_profile(self):
-
-        result = self.client.get('/profile')
-        self.assertIn("Redirecting", result.data)
-        # self.assertIn("Register", result.data)
-        # self.assertNotIn("Member Home Page", result.data)
-
-        # self.assertIn("This is a list of your most recent trips:", result.data)
 
     def test_logout(self):
         """Tests logout procedure"""

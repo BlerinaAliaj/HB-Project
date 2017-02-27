@@ -27,39 +27,5 @@
   </ul>
 </div>
 <script src="https://code.jquery.com/jquery.js"></script>
-<script>
-// This scrip creates new trip
-$("#mylink").on("click", function(evt) {
-  evt.preventDefault();
-  $(".col-xs-12").attr("style", "display:inline");
-
-});
-
-$("#minimize").on("click", function(evt) {
-  $(".col-xs-12").attr("style", "display:none");
-});
-
-$(".tripform").on('submit', submitTrip)
-
-function submitTrip(evt) {
-  evt.preventDefault();
-  // var tripcode = $("#tripc").val()
-  var tripname = $("#tripn").val()
-  tripData = {"tripname": $("#tripn").val(),
-              "datestart": $("#sdate").val(),
-              "numdays": $("#numdays").val()}
-
-
-  // var new_line = "<li><a href='/trip_detail/"+tripCode+"'>"+tripname+"</a></li>";
-  $.post("/new_trip", tripData, function(response) { 
-    my_response = JSON.parse(response)
-    console.log(my_response);
-    tripCode = my_response["tripCode"];
-    console.log(response);
-    console.log(tripCode);
-    var new_line = "<li><a href='/trip_detail/"+tripCode+"'>"+tripname+"</a></li>";
-    $("#new_trip").before(new_line) ;});
-}
-
-</script>
+<script src="/static/create_trip.js"></script>
 {% endblock %}

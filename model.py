@@ -221,6 +221,7 @@ class Route(db.Model):
     trip = db.relationship("Trip", backref=db.backref("routes"))
 
 
+
 ##############################################################################
 # Helper functions
 
@@ -230,6 +231,8 @@ def connect_to_db(app):
 
     # Configure to use our PstgreSQL database
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///hiker'
+    # app.config['SQLALCHEMY_BINDS'] = {'gis': 'postgresql:///gis'}
+
     db.app = app
     db.init_app(app)
 
