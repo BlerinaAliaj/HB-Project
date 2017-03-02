@@ -84,6 +84,10 @@ class UserTrip(db.Model):
     trip_code = db.Column(db.String(10), db.ForeignKey('trips.trip_code'), nullable=False)
     user_id = db.Column(db.String(20), db.ForeignKey('users.user_id'), nullable=False)
 
+
+    user = db.relationship("User", backref="users_trips")
+
+
     def __repr__(self):
         """Provide helpful representation when printed."""
 

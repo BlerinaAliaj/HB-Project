@@ -1,7 +1,7 @@
 // JS for trip detail page
 
-function submitList(evt) {
-  evt.preventDefault();
+function submitList(event) {
+  event.preventDefault();
   var allList = {};
   var allData = {};
   var rowId;
@@ -20,9 +20,9 @@ function submitList(evt) {
         $('#'+rowId).each(function() {
         desc = $(this).find('#indesc').val();
         usid = $(this).find('#inusid').val();
-        comp = $(this).find('#incomp').is(":checked");
+        comp = $(this).find('#incomp').val();
 
-        // console.log(comp);
+        console.log(comp);
 
         allData[rowId] = {"description": desc,
                         "userid": usid,
@@ -33,7 +33,7 @@ function submitList(evt) {
         desc = $(this).find('#desc').text();
         usid = $(this).find('#usid').text();
         comp = $(this).find('#comp').text();
-        console.log(comp);
+        // console.log(comp);
 
         allData[rowId] = {"description": desc,
                         "userid": usid,

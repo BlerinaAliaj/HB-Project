@@ -25,7 +25,7 @@ app.jinja_env.undefined = StrictUndefined
 
 # Create connection to my 'gis' database
 
-gis_db = create_engine('postgresql:///gis2')
+gis_db = create_engine('postgresql:///gis')
 GISSession = sessionmaker(gis_db)
 
 
@@ -46,7 +46,7 @@ def login_page():
     if "user" in session:
         return redirect("/profile")
 
-    return render_template("login.html")
+    return render_template("homepage.html")
 
 
 @app.route('/login', methods=["POST"])
@@ -55,8 +55,6 @@ def login():
 
     username = request.form.get('username')
     password = request.form.get('password')
-    # print username
-    # print password
 
     query_user = User.query.filter_by(user_id=username).first()
 
@@ -66,13 +64,22 @@ def login():
         if password == user_pass:
             # We add user id and password to sessions user dictionary
             session["user"] = query_user.user_id
+
+            # Query trips so it redirects to the most recent trip
+            query = User.query.get(session["user"])
+
+            # query trips and show them in reverse chronological order
+            trips = query.trips
+            sorted_trips = sorted(trips, key=lambda x: x.date_created, reverse=True)
+
+            trip_code = sorted_trips[0].trip_code
+
             flash('You have successfully logged in.')
-            return redirect("/profile")
-            # return redirect('/user_detail/' + str(user_id))
+            return redirect("/trip_detail/"+trip_code)
 
         else:
             flash("Your username and password are not correct.")
-            return render_template("login.html")
+            return render_template("homepage.html")
 
     else:
         flash("""Sorry, that username doesn't exist. Please try again or go to
@@ -180,25 +187,15 @@ def get_trip_data():
 def create_trip():
     """Route that will log new trip information to database"""
 
-    #To create new trip we need add to Trip and UserTrip to log everything in
-    # Trip: trip_code, trip_name, date_created, date_start, start_loc, end_loc
-    # num_days
-
-    # UserTrip: trip_code, user_id
-
     if 'user' in session:
         username = session['user']
-        # trip_code = request.form.get('tripcode')
         trip_name = request.form.get('tripname')
         date_created = datetime.datetime.now()
         date_start = request.form.get('datestart')
-        # start_loc = request.form.get('startloc')
-        # end_loc = request.form.get('endloc')
         num_days = int(request.form.get('numdays'))
 
         # Generate trip code here:
         trip_abbr = trip_name[:4].lower()
-        print trip_abbr
         query_trips = Trip.query.all()
 
         for trip in query_trips:
@@ -207,7 +204,7 @@ def create_trip():
                 appx = int(trip.trip_code[4:])
                 appx += 1
                 trip_code = trip_abbr + format(appx, "03")
-                print trip_code
+                # print trip_code
                 break
             else:
                 trip_code = trip_abbr + "000"
@@ -223,9 +220,8 @@ def create_trip():
         db.session.add(new_trip_log)
         db.session.commit()
 
-        # return redirect('/profile')
         return json.dumps({'status': 'ok', 'user': username, 'tripCode': trip_code})
-        # return redirect('/trip_detail/'+trip_code)
+
     else:
         flash("You are not logged in. Please do so.")
         return redirect('/')
@@ -233,12 +229,7 @@ def create_trip():
 
 @app.route('/trip_detail/<trip_code>')
 def trip_detail(trip_code):
-    """Page that displays all information about the trip.
-
-    This is where all the cool stuff happens :)
-    """
-    #print trip_code
-    # UserTrip: trip_code, user_id
+    """Page that displays all information about the trip."""
 
     if 'user' in session:
         # get username from session
@@ -272,49 +263,43 @@ def trip_detail(trip_code):
         # list to show latest trip first
         sorted_trips = sorted(trips, key=lambda x: x.date_created, reverse=True)
 
+        trip_date = query_trip.date_start.strftime("%B %d, %Y")
+        trip_length = query_trip.num_days
+        trip_loc = query_trip.start_loc
 
-
-        # add information for display in the webpage
         return render_template('trip_detail.html', username=username, name=name,
                     trip_name=trip_name, members=members, trips=sorted_trips,
-                    trip_code=trip_code, items=items, messages=comments)
+                    trip_code=trip_code, items=items, messages=comments,
+                    trip_date=trip_date, trip_length=trip_length, trip_loc=trip_loc)
     else:
         flash("You are not logged in. Please do so.")
         return redirect('/')
 
 
-# @app.route('/message.json/<trip_code>', methods=["GET"])
-# def read_message(trip_code):
-#     """Queries messages/comments table for all messages for that trip"""
+@app.route('/list_trips')
+def list_trips():
+    """Returns list of all trips"""
 
-#     query_comment = Comment.query.filter_by(trip_code=trip_code)
-#     comments = query_comment.all()
-#     sorted_messages = sorted(comments, key=lambda x: x.time, reverse=True)
+    if 'user' in session:
+        # get username from session
+        username = session['user']
 
-#     messages = {}
+    query_user = User.query.get(username)
 
-#     for message in sorted_messages:
-#         messages[message.comment_id] = {"message": message.comment,
-#                                         "user": message.user_id,
-#                                         "timestamp": message.time}
+    # query trips and show them in reverse chronological order
+    trips = query_user.trips
+    sorted_trips = sorted(trips, key=lambda x: x.date_created, reverse=True)
 
-#     return jsonify(messages)
+    my_json = {}
+    my_json['trips'] = []
 
+    for trip in sorted_trips:
+        my_json['trips'].append({'trip_name': trip.trip_name,
+                                 'trip_code': trip.trip_code,
+                                 })
+    # print my_json
+    return json.dumps(my_json)
 
-# @app.route('/message', methods=["POST"])
-# def commit_message():
-#     """Write messages to server """
-
-#     username = session['user']
-#     message = request.form.get("message")
-#     trip_code = request.form.get("trip_code")
-
-#     # Write message to database
-#     my_message = Comment(trip_code=trip_code, user_id=username, comment=message,
-#                          time=datetime.datetime.now())
-#     db.session.add(my_message)
-#     db.session.commit()
-#     return redirect("/trip_detail/"+trip_code)
 
 @socketio.on('join')
 def on_join(room):
@@ -323,6 +308,7 @@ def on_join(room):
     print 'joined room %s' % room
 
     user_name = session['user']
+    # print user_name
     emit('message', user_name + ' has entered the room.', room=room)
 
 
@@ -348,77 +334,99 @@ def handleMessage(msg):
     send(msg['msg'], room=msg['room'])
 
 
+@app.route('/list.json', methods=["GET"])
+def get_list_items():
+
+    trip_code = request.headers.get('trip_code')
+    print "my trip code is %s" % trip_code
+
+    query_list = CheckList.query.filter_by(trip_code=trip_code).order_by(CheckList.item_id)
+    # Query Lists:
+    items = query_list.all()
+
+    # Query members for that trip
+    members = UserTrip.query.filter_by(trip_code=trip_code).all()
+    member_list = []
+
+    for member in members:
+        member_list.append((member.user.first_name, member.user_id))
+        
+
+    print member_list
+
+    my_json = {}
+    my_json['items'] = []
+    my_json['users'] = member_list
+    print my_json
+
+    for item in items:
+        my_json['items'].append({'item_id': item.item_id,
+                                 'trip_code': item.trip_code,
+                                 'userid': item.user_id,
+                                 'description': item.description,
+                                 'selected': item.completed})
+    print json.dumps(my_json)
+    return json.dumps(my_json)
+
+
 @app.route('/list.json', methods=["POST"])
 def add_to_list():
-    """Adds items to list table"""
+    """Reads items from database. Adds items to list table"""
 
-    trip_code = request.form.get('tripCode')
-    print trip_code
+    all_data = json.loads(request.data)
+    trip_code = all_data['tripCode']
 
-    all_data = request.form.get('allData')
-    data = json.loads(all_data)
-    print all_data
+    print "list trip code is %s" % trip_code
+
+    data = json.loads(all_data['data'])
+
+    new_data = json.loads(all_data['newdata'])
+
     print data
+    print new_data
 
     for key in data:
-        if key == "addItem":
-            # We write new items to database
-            user_id = data[key]["userid"]
-            list_item = data[key]["description"]
-            completed = data[key]["completed"]
-            print completed
+        # We check to see if key is in database table and rewrite the values
+        user_id = key["userid"]
+        list_item = key["description"]
+        completed = key["completed"]
+        item_id = key['list_id']
 
-            if not completed:
-                completed = False
+        # query list for the list id
+        query_list = CheckList.query.get(item_id)
 
-            if list_item and user_id: 
+        query_list.user_id = user_id
+        query_list.description = list_item
+        query_list.completed = completed
+        db.session.commit()
 
-                my_list = CheckList(trip_code=trip_code, user_id=user_id, description=list_item,
-                            completed=completed)
+    for key in new_data:
+        # We write new items to database
+        user_id = key["userid"]
+        list_item = key["description"]
+        completed = key["completed"]
 
-                db.session.add(my_list)
-                db.session.commit()
+        if list_item != "" and user_id != "":
 
-        elif key != "header":
-            # We check to see if key is in database table and rewrite the values
-            user_id = data[key]["userid"]
-            list_item = data[key]["description"]
-            completed = data[key]["completed"]
+            my_list = CheckList(trip_code=trip_code, user_id=user_id, description=list_item,
+                        completed=completed)
 
-            # query list for the list id
-            query_list = CheckList.query.get(key)
-
-            query_list.user_id = user_id
-            query_list.description = list_item
-            query_list.completed = completed
+            db.session.add(my_list)
             db.session.commit()
 
-    # return trip_code
+    query_data = CheckList.query.filter_by(trip_code=trip_code).all()
 
-    return redirect("/trip_detail/"+trip_code)
+    my_json = {}
+    my_json['items'] = []
 
+    for item in query_data:
+        my_json['items'].append({'item_id': item.item_id,
+                                 'trip_code': item.trip_code,
+                                 'userid': item.user_id,
+                                 'description': item.description,
+                                 'selected': item.completed})
 
-
-
-
-# @app.route('/list/<trip_code>', methods=["POST"])
-# def add_to_list(trip_code):
-#     """Adds items to list table"""
-
-#     list_item = request.form.get("description")
-#     print list_item
-#     user_id = request.form.get("userid")
-#     completed = request.form.get("completed")
-#     if not completed:
-#         completed = False
-
-#     # Write list to database
-#     my_list = CheckList(trip_code=trip_code, user_id=user_id, description=list_item,
-#                         completed=completed)
-
-#     db.session.add(my_list)
-#     db.session.commit()
-#     return redirect("/trip_detail/"+trip_code)
+    return json.dumps(my_json)
 
 
 @app.route('/add_member/<trip_code>', methods=["GET"])
@@ -433,7 +441,7 @@ def add_members_form(trip_code):
 
     for user in query_users:
         user_set.add(user.user_id)
-        print user.user_id
+        print "user ID : %s" % user.user_id
 
     # get users that don't have that trip code
     all_users = User.query.all()
@@ -448,7 +456,7 @@ def add_members(trip_code):
     """Add members to trip """
 
     user_id = request.form.get("memberid")
-    print user_id
+    print "user ID: %s" % user_id
 
     new_member = UserTrip(trip_code=trip_code, user_id=user_id)
     db.session.add(new_member)
@@ -481,16 +489,16 @@ def add_marker_data():
     trip_code = request.form.get('trip_code')
 
     search_trip = Route.query.filter_by(trip_code=trip_code).all()
-    print search_trip
+    # print search_trip
 
     if search_trip:
         for trip in search_trip:
-            print trip
+            # print trip
             db.session.delete(trip)
             db.session.commit()
 
     for key in my_markers:
-        print key
+        # print key
         lat = my_markers[key]['lat']
         lon = my_markers[key]['lng']
         desc = my_markers[key].get('marker_description', None)
@@ -506,6 +514,7 @@ def add_marker_data():
 def query_osm_on_viewport():
     """Queries osm databased based on viewport, returns all ways within the viewport"""
 
+    # Creates separate database session for 'gis' database
     gis_session = GISSession()
 
     latNE = request.args.get('latNE')
@@ -513,7 +522,7 @@ def query_osm_on_viewport():
     latSW = request.args.get('latSW')
     lngSW = request.args.get('lngSW')
 
-    sql = """SELECT name, ST_AsGeoJSON(way) AS geo_json
+    sql = """SELECT osm_id, name, ST_AsGeoJSON(way) AS geo_json
                 FROM planet_osm_line
                     WHERE (
                         way && ST_MakeEnvelope(:lngSW, :latSW, :lngNE, :latNE, 4326)
@@ -521,20 +530,17 @@ def query_osm_on_viewport():
                         way ~ ST_MakeEnvelope(:lngSW, :latSW, :lngNE, :latNE, 4326)
                         OR 
                         way @ ST_MakeEnvelope(:lngSW, :latSW, :lngNE, :latNE, 4326)
-                    )
-             UNION
-             SELECT name, ST_AsGeoJSON(way) AS geo_json
-                FROM planet_osm_roads
-                    WHERE (
-                        way && ST_MakeEnvelope(:lngSW, :latSW, :lngNE, :latNE, 4326)
-                        OR
-                        way ~ ST_MakeEnvelope(:lngSW, :latSW, :lngNE, :latNE, 4326)
-                        OR 
-                        way @ ST_MakeEnvelope(:lngSW, :latSW, :lngNE, :latNE, 4326)
-                    )
-          """
-
-    # sql = """SELECT node_id
+                    ) """
+             # UNION
+             # SELECT osm_id, name, ST_AsGeoJSON(way) AS geo_json
+             #    FROM planet_osm_roads
+             #        WHERE (
+             #            way && ST_MakeEnvelope(:lngSW, :latSW, :lngNE, :latNE, 4326)
+             #            OR
+             #            way ~ ST_MakeEnvelope(:lngSW, :latSW, :lngNE, :latNE, 4326)
+             #            OR 
+             #            way @ ST_MakeEnvelope(:lngSW, :latSW, :lngNE, :latNE, 4326)
+             #        )
 
     all_nodes = gis_session.execute(sql, {'lngSW': lngSW,
                              'latSW': latSW,
@@ -543,18 +549,20 @@ def query_osm_on_viewport():
 
     nodes = all_nodes.fetchall()
 
-    print nodes
+    # print nodes
 
     my_gis_data = {}
 
-    for trail_name, geo_json in nodes:
-        my_gis_data[trail_name] = {
-            'type': "Feature",
-            'geometry': json.loads(geo_json),
-            'properties': {
-                'name': trail_name
+    for shape_id, trail_name, geo_json in nodes:
+        if trail_name != None:
+            my_gis_data[trail_name] = {
+                'type': "Feature",
+                'geometry': json.loads(geo_json),
+                'properties': {
+                    'id': shape_id,
+                    'name': trail_name
+                }
             }
-        }
 
     return json.dumps(my_gis_data)
 

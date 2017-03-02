@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %} 
+<meta name="viewport" content="initial-scale=1.0">
+<meta charset="utf-8">
+<style type="text/css"></style>
+{% endblock %}
+
+{% block content %}
+
+<div class="col-xs-3" style="height: 300px">
+  <a id="mylink" href="/new_trip">Create New Trip</a>
+    <div class="col-xs-12" style="display:none">
+      <h1>Please fill out information about your trip below:</h1>
+      <form class="tripform" action="/new_trip" method="POST">
+      Trip Name: <input id="tripn" type="text" name="tripname"><br>
+      Start Date: <input id="sdate" type="date" name="datestart"><br>
+      Number of Days: <input id="numdays" type="number" name="numdays"><br>
+      <input type="submit" value="submit"><br>
+      <input id="minimize" type="button" value="Minimize">
+      </form>
+    </div>
+
+
+  <div ng-app="listtrips" ng-controller="ListLatestTrips">
+    <p>This is a list of your most recent trips:</p>
+    <ul >
+          <li id="new_trip" ng-repeat="trip in trips">
+              <a href="/trip_detail/{{ trip.trip_code }}">
+                {{ trip.trip_name }}</a> 
+          </li>
+    </ul>
+  </div>
+
+</div>
+
+
+
+<script type="text/javascript">
+
+var app = angular.module('listtrip', []);
+app.controller('ListLatestTrips', function ($scope) {
+
+    $http.get('/list_trips').then(function(response) {
+
+    });
+
+
+
+
+});
+
+
+
+
+
+
+
+</script>
+
+
+
+
+
+
+{% endblock %}

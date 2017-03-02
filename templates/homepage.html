@@ -3,37 +3,37 @@
 
 <div class="row">
     <!--Columns go here-->
-    <div class="col-xs-4"> 
+    <div class="col-xs-8"> 
         <h1>Welcome to the One-Stop Location for adventure planning!</h1>
         <h2>Let's start!</h2>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
         <h1>Registe Here</h1>
         <form id="registration" action="/register" method="POST">
             <div class="row">
-                <div class="col-xs-4">
-                <input id='fname' type="text" name="firstname" required placeholder="First Name">
-                </div>
-                <div class="col-xs-4">
-                <input id='lname' type="text" name="lastname" required placeholder="Last Name">
+                <div class="col-xs-12">
+                <input id='uname' type="text" name="username" required placeholder="User Name" style="width: 100%">
                 </div>
             </div>
             <div class="row">
                 <div class="col-xs-6">
-                <input id='uname' type="text" name="username" required placeholder="User Name">
+                <input id='fname' type="text" name="firstname" required placeholder="First Name" style="width: 100%; padding-right: 0px">
+                </div>
+                <div class="col-xs-6">
+                <input id='lname' type="text" name="lastname" required placeholder="Last Name" style="width: 100%; padding-left: 0px">
                 </div>
             </div>
             <div class="row">
-                <div class="col-xs-4">
-                <input id='email' type="email" name="email" required placeholder="Email">
+                <div class="col-xs-6">
+                <input id='email' type="email" name="email" required placeholder="Email" style="width: 100%; padding-left: 0px">
                 </div>
-                <div class="col-xs-4">
-                <input id='pwd' type="password" name="password" required placeholder="Password">
+                <div class="col-xs-6">
+                <input id='zipc' type="text" name="zipcode" placeholder="Zipcode" style="width: 100%; padding-left: 0px">
                 </div>
             </div>
-              <div class="row">
-                <div class="col-xs-4">
-                <input id='zipc' type="text" name="zipcode" placeholder="Zipcode">
+            <div class="row">
+                <div class="col-xs-12">
+                <input id='pwd' type="password" name="password" required placeholder="Password" style="width: 100%; padding-left: 0px">
                 </div>
                 
             </div>

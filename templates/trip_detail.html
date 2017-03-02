@@ -6,10 +6,22 @@
 <style type="text/css"></style>
 {% endblock %}
 
+{% block head %}
+<!-- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"> -->
+<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.0/united/bootstrap.min.css"
+        rel="stylesheet">
+<link href="/static/style.css" rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.2/angular.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.2/angular-route.js"></script>
+{% endblock %}
+
 {% block content %}
 
-<div class="col-xs-3" style="height: 300px">
-  <a id="mylink" href="/new_trip">Create New Trip</a>
+
+
+<div class="row" style="height: 300px">
+  <div class="col-xs-3" style="height: 300px">
+    <a id="mylink" href="/new_trip">Create New Trip</a>
     <div class="col-xs-12" style="display:none">
       <h1>Please fill out information about your trip below:</h1>
       <form class="tripform" action="/new_trip" method="POST">
@@ -20,126 +32,149 @@
       <input id="minimize" type="button" value="Minimize">
       </form>
     </div>
-  <div>
-    <p>This is a list of your most recent trips:</p>
-    <ul >
-      {% for trip in trips %}
-          <li id="new_trip">
-              <a href="/trip_detail/{{ trip.trip_code }}">
-                {{ trip.trip_name }}</a> 
+
+    <div ng-controller="ListLatestTrips" style="overflow-y: scroll; height: 300px">
+      <p>Recent trips:</p>
+        {% raw %}
+          <li id="new_trip" ng-repeat="x in mytrips" >
+            <a href="/trip_detail/{{ x.trip_code }}">
+                {{ x.trip_name }}</a> 
           </li>
-      {% endfor %}
-    </ul>
+        {% endraw %}
+    </div>
   </div>
 
-</div>
-
-<div class="col-xs-3" style="display:inline-block"=>
-    <h1>Hello {{ name }}:</h1>
-    <h1>Welcome to {{ trip_name }} trip page. </h1>
-    
-    <h2>People that are joining you on this trip:</h2>
-
-    <ul>
-        {% for member in members %}
-            {% if member.user_id != username %}
-
-            <li>
-              <a href="/member_profile/{{ username }}">
-                {{ member.first_name }} {{ member.last_name }}</a> 
-            </li>
-
-          {% endif %}
-      {% endfor %}
-
-    </ul>
-    <a href="/add_member/{{ trip_code }}">Add members to this trip</a>
-</div>
-
-<div class="list" style="width: 400px, height: 500px display: inline-block">
-  <h1> Your List here</h1>
-  <form class="updateList" action="/list/{{ trip_code }}" method="POST">
-    <table class="editabletable" border="1">
-      <tbody>
-        <tr id='header'>
-          <td> Action Items </td>
-          <td>Action Assigned To</td>
-          <td>Completed (Y/N)</td>
-        </tr>
-        {% if items %}
-        {% for item in items %}
-        <tr id="{{ item.item_id }}">
-          <td><div id='desc' contenteditable>{{ item.description }}</div></td>
-          <td><div id='usid' contenteditable>{{ item.user_id }}</div></td>
-          <td><div id='comp' contenteditable>{{ item.completed }}</div></td>
-          <!-- <td><input id='comp' type="checkbox" name="comp" value="{{ item.completed }}">{{ item.completed }}</td> -->
-        </tr>
+  <div class="col-xs-4" style="display:inline-block"=>
+      <h3>Hello {{ name }}:</h3>
+      <h4>Welcome to {{ trip_name }} trip page. </h4>    
+      <h5>People that are joining you on this trip:</h5>
+      <ul>
+          {% for member in members %}
+              {% if member.user_id != username %}
+              <li>
+                <a href="/member_profile/{{ username }}">
+                  {{ member.first_name }} {{ member.last_name }}</a> 
+              </li>
+            {% endif %}
         {% endfor %}
-        {% endif %}
-        <tr id="addItem">
-          <td><input id="indesc" type="text" name="description"></td>
-          <td><input id="inusid" type="text" name="userid"></td>
-          <td><input id="incomp" type="checkbox" name="completed"></td>
-        </tr>
-      </tbody>
-      <input id="listitem" type='submit' value='Update List' >
+      </ul>
+      <a href="/add_member/{{ trip_code }}">Add members to this trip</a>
 
+      <h5>Trip Stats </h5>
+      <h6>Trip Date: {{ trip_date }}</h6>
+      <h6>Trip Duration: {{ trip_length }} day </h6>
+      <h6>Trip Location: {{ trip_loc }}</h6>
+      <h6>Markers: </h6>
+  </div>
 
-    </table>
-  </form>
+  <div class="col-xs-5" >
+    <div ng-controller="ListController" style="width: 400px, height: 300px display: inline-block">
+      <h3>To-Do List</h3>
+      <form ng-submit="addAll(itemDetail, addItem)" style="height: 300px; overflow-y: scroll" name="myform">
+
+        <table class="table table-striped table-bordered">
+          <thead >
+            <tr>
+              <th>Action Items</th>
+              <th>Action Assigned</th>
+              <th>Done(Y/N)</th>
+            </tr>
+          </thead>
+          <tbody style="height: 200px; overflow-y: scroll">
+            <tr ng-repeat="itemDetail in itemDetails" ng-model="itemDetail.item_id">
+              <td>
+                <input type="text" class="form-control" ng-model="itemDetail.description"/>
+              </td>
+              <td>
+                <input type="text" class="form-control" ng-model="itemDetail.userid" typeahead="user.userID for user in usernames | filter: $viewValue"/>
+              </td>
+              <td>
+                <input type="checkbox" ng-model="itemDetail.selected"/>
+              </td>
+            </tr>
+            <tr >
+              <td>
+                <input type="text" class="form-control" ng-model="addItem.description" ng-init="addItem.description=none"/>
+              </td>
+              <td>
+                <input type="text" class="form-control" ng-model="addItem.userid" ng-init="addItem.userid=none" uib-typeahead="user.userID for user in usernames | filter: $viewValue"/>
+              </td>
+              <td>
+                <input type="checkbox" ng-model="addItem.selected" ng-init="addItem.selected=false"/>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="form-group">
+          <!-- <input ng-hide="!itemDetails.length" type="button" class="btn btn-danger pull-right" ng-click="remove()" value="Remove"> -->
+          <input type="submit" class="btn btn-primary addnew pull-right" value="Update" ng-click="addAll">
+        </div>
+      </form>   
+    </div>
+  </div>
 </div>
 
-<div >
-<h1> Your Maps go here:</h1>
+<div class="row" style="height: 400px">
+  <div class="col-xs-8">
     <div id="floating-panel">
-      <input id="address" type="textbox" value="San Francisco, CA">
+      <input id="address" type="textbox" value="Yosemite Valley, CA">
       <input id="submit" type="button" value="Geocode">
       <input id="submarker" type="button" value="Log This Route">
     </div>
-    <div id="map" style="width: 600px; height: 400px; "></div>
+    <div class="row">
+      <div class="col-xs-10" id="map" style="width: 70%; height: 400px; "></div>
+      <div class="col-xs-3" style="overflow-y: scroll; height: 400px">
+        <ul id="trailDesc"></ul>
+      </div>
+      <div id="elevation_chart"></div>
+    </div>
+  </div>
+
+  <div class="col-xs-4">
+    <div id="chatlogs" style="width: 600px" >
+        <h3>Group Communication:</h3>
+      
+       <ul id="messages" style="height: 100px; overflow-y:scroll">
+        {% for msg in messages %}
+          <li style="width: 100">{{ msg.comment }}</li>
+
+        {% endfor %}
+       </ul>
+    </div>
+    <div id="chat-end"></div>
+
+  <div >
+    <form id="sendmessage">
+      <textarea rows="4" cols="40" id="mytext" name="mymessage"></textarea>
+      <input id="sendbutton" type="button" value="Send Message">
+    </form>
+  </div>
 </div>
-
-
-<div id="chatlogs" style="width: 600px" >
-    <h1>Group Communication:</h1>
-  
-   <ul id="messages" style="height: 100px; overflow-y: auto">
-    {% for msg in messages %}
-      <li style="width: 100">{{ msg.comment }}</li>
-
-    {% endfor %}
-   </ul>
-<div id="chat-end"></div>
-
-</div>
-
-<div >
-  <form id="sendmessage">
-    <textarea rows="4" cols="40" id="mytext" name="mymessage"></textarea>
-    <input id="sendbutton" type="button" value="Send Message" >
-  </form>
-</div>
-
-
-<div>
-  <h1> This is the End</h1>
-  <h2> Yes it is</h2>
 </div>
 
 <!-- Place your scripts here:  -->
-<script src="https://code.jquery.com/jquery.js"></script>
+<!-- <script src="https://code.jquery.com/jquery.js"></script> -->
 <script type="text/javascript"> 
 var tripCode = "{{ trip_code }}";
+
+// google.load('visualization', '1', {packages: ['columnchart']});
+
+
 </script>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 <script type="text/javascript" src="/static/myscript.js"></script>
 <script type="text/javascript" src="/static/chat.js"></script>
-<script type="/static/trip_detail.js"></script>
+<!-- <script src="/static/trip_detail.js"></script> -->
+<script src="/static/my_ang.js"></script>
 <script src="/static/create_trip.js"></script>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=key&callback=initMap"
 async defer></script>
+
+
+
 
 {% endblock %}
