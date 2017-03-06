@@ -9,8 +9,12 @@ var map;
 var uniqueId = 0;
 var markers = [];
 var timeout;
+var chart;
+var elSvc;
+var path = new Array();
 
 function initMap() {
+
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 37.733493, lng: -119.594947},
     zoom: 15,
@@ -20,6 +24,42 @@ function initMap() {
 
   $.get('/add_marker.json/'+tripCode, showMarkers);
 
+  // $.get('/add_alt_graph'+tripCode, function() { 
+
+    // plottingComplete(data);
+
+  // });
+
+  map.data.addListener('click', function(mouseEvent) {
+    var geometry = mouseEvent.feature.getGeometry();
+    var feat_id = mouseEvent.feature.getProperty("id");
+    var box = mouseEvent.feature.getProperty('window');
+
+    var points = [];
+
+    if (geometry.getType() === 'MultiLineString') {
+        geometry.getArray.forEach(function(lineString) {
+          points.push.apply(points, lineString.getArray());
+        });
+    } else {
+        points.push.apply(points, geometry.getArray());
+    }
+
+    // var route_info = {"route_id": feat_id,
+    //               "bounding_box": box };
+
+    // $.post('/add_alt_graph'+tripCode, route_info, function() {alert('We added this graph');});
+
+
+    plottingComplete(points);
+  });
+
+  chart = new google.visualization.ColumnChart(document.getElementById('elevation_chart'));
+
+  // Creates an elevation service
+
+  elSvc = new google.maps.ElevationService();
+
   // Geocoding method geocodes one location per request when submit button
   // is pushed. 
   var geocoder = new google.maps.Geocoder();
@@ -28,7 +68,8 @@ function initMap() {
   
   // calls in function placeMarkerAndPanTo on double click action
   map.addListener('dblclick', function(evt) {
-    placeMarkerAndPanTo(evt.latLng); });
+    placeMarkerAndPanTo(evt.latLng);
+     });
 
   map.addListener('bounds_changed', function () {
     clearTimeout(timeout);
@@ -53,10 +94,13 @@ function showMarkers(data) {
         marker.description = data[key].description;
         uniqueId ++;
         markers.push(marker);
+        // This is where I set up marker paths
+        path.push(myLatLng);
         google.maps.event.addListener(marker, "rightclick", function (event) { showMarkerWindow(marker);});
       }());
     }
   }
+  // console.log(markers[0].position.lat());
 }
 
 // Creates info window for each marker with option to add description
@@ -81,6 +125,7 @@ function placeMarkerAndPanTo(latLng) {
   marker.id = uniqueId;
   uniqueId ++;
   markers.push(marker);
+  path.push(latLng);
 
   // console.log(marker.position.lat());
   // This pops up a window with a marker description and option to delete
@@ -95,6 +140,7 @@ var deleteMarker = function (id) {
     if (markers[i].id == id) {
       markers[i].setMap(null);
       markers.splice(i, 1);
+      path.splice(i, 1);
       return;
     }
   }
@@ -141,14 +187,17 @@ function geocodeAddress(geocoder, resultsMap) {
   });
 }
 
-document.getElementById('submarker').addEventListener('click', function() {saveRoute(markers); } );
+document.getElementById('submarker').addEventListener('click', function(event) {
+  saveRoute(markers);
+  });
 
 // Post data to flask
 function saveRoute(markers) {
   event.preventDefault();
+  plottingComplete();
 
   var dataInput = {};
-  console.log(markers);
+  // console.log(markers);
   for (var i = 0; i < markers.length; i++) {
       dataInput[markers[i].id] = {
       "lat": markers[i].position.lat(),
@@ -159,6 +208,47 @@ function saveRoute(markers) {
   my_data = {"data": JSON.stringify(dataInput), "trip_code": tripCode};
   // console.log(my_data);
   $.post('/add_marker.json', my_data, function() {alert("You successfully logged this trip");});
+}
+
+
+function plottingComplete(path) {
+  // console.log('We are here');
+  // console.log(path);
+  // var pathOptions = {
+  //   path: path,
+  //   strokeColor: '#0000CC',
+  //   opacity: 0.4,
+  //   map: map
+  // };
+
+  // polyline = new google.maps.Polyline(pathOptions);
+
+  var pathRequest = {
+    'path': path,
+    'samples': 256
+  };
+  elSvc.getElevationAlongPath(pathRequest, plotElevation);
+}
+
+
+function plotElevation(results, status){
+  if (status == google.maps.ElevationStatus.OK) {
+    elevation = results;
+
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Sample');
+    data.addColumn('number', 'Elevation');
+    for (var i = 0; i < results.length; i++) {
+      data.addRow(['', elevation[i].elevation]);
+    }
+    document.getElementById('elevation_chart').style.display = 'block';
+    chart.draw(data, {
+      width: 300,
+      height: 300,
+      legend: 'none',
+      titleY: 'Elevation (m)'
+    });
+  }
 }
 
 function queryGISDatabase(resultsMap) {
@@ -187,17 +277,19 @@ function queryGISDatabase(resultsMap) {
     for (var key in gisData) {
       // console.log("Adding: %s", JSON.stringify(gisData[key]));
       var featureJSON = gisData[key];
-      console.log(featureJSON);
+      // console.log(featureJSON.geometry.coordinates);
       var featureID = featureJSON.properties.id;
       var featureName = featureJSON.properties.name;
       // console.log(featureName);
 
       var mapFeature = map.data.addGeoJson(featureJSON)[0];
+      // console.log(mapFeature);
       var featureColor = '#' + Math.abs(featureID).toString(16).substr(0,6);
       li.append("<li style='color:"+featureColor+";'>" + featureName + '</li>');
 
 
-      map.data.overrideStyle(mapFeature, {strokeColor: featureColor});
+      map.data.overrideStyle(mapFeature, {strokeColor: featureColor, clickable: true});
+      // mapFeature.onclick()
     }
     // alert("Yay");
   });

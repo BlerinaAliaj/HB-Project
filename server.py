@@ -172,15 +172,15 @@ def display_friend_info(user_id):
     pass
 
 
-@app.route('/new_trip', methods=["GET"])
-def get_trip_data():
-    """Template to create new trip"""
+# @app.route('/new_trip', methods=["GET"])
+# def get_trip_data():
+#     """Template to create new trip"""
 
-    if 'user' in session:
-        return render_template("new_trip.html")
-    else:
-        flash("You are not logged in. Please do so.")
-        return redirect('/')
+#     if 'user' in session:
+#         return render_template("new_trip.html")
+#     else:
+#         flash("You are not logged in. Please do so.")
+#         return redirect('/')
 
 
 @app.route('/new_trip', methods=["POST"])
@@ -559,6 +559,7 @@ def query_osm_on_viewport():
                 'type': "Feature",
                 'geometry': json.loads(geo_json),
                 'properties': {
+                    'window': [latNE, lngNE, latSW, lngSW],
                     'id': shape_id,
                     'name': trail_name
                 }
@@ -575,7 +576,7 @@ if __name__ == "__main__":
     connect_to_db(app)
 
     # Use the DebugToolbar
-    DebugToolbarExtension(app)
+    # DebugToolbarExtension(app)
 
     # app.run(port=5000, host='0.0.0.0')
     # for websockets use the socketio.run instead of app.run
