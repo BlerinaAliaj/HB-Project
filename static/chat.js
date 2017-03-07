@@ -12,13 +12,14 @@ $(document).ready(function() {
 
 
 socket.on('message', function(msg) {
-  $("#messages").append('<li>' + msg + '</li>');
+  $("#messages").append('<li class="right clearfix"><span class="chat-img pull-right"><img src="http://placehold.it/50/FA6F57/fff&text=ME" alt="User Avatar" class="img-circle"/></span><div class="chat-body clearfix"><div class="header"><small class=" text-muted"><span class="glyphicon glyphicon-time"></span>13 mins ago</small><strong class="pull-right primary-font">'+ userid + '</strong></div><p>' + msg +'</p></div></li>');
   console.log('Received message');
 });
 
 $('#sendbutton').on('click', function() {
-  socket.emit('json', { "msg": $("#mytext").val(), "room": tripCode});
-  $("#mytext").val(''); }); });
+  console.log($("#mytext.form-control").val());
+  socket.emit('json', { "msg": $("#mytext.form-control").val(), "room": tripCode});
+  $("#mytext.form-control").val(''); }); });
 
 //JQuery to update messages
 

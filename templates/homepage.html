@@ -1,4 +1,16 @@
 {% extends 'base.html' %}
+{% block head %}
+<!-- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"> -->
+<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.0/united/bootstrap.min.css"
+        rel="stylesheet">
+
+<link href="/static/homepage.css" rel="stylesheet">
+
+{% endblock %}
+
+
+
+
 {% block content %}
 
 <div class="row">
@@ -8,7 +20,7 @@
         <h2>Let's start!</h2>
     </div>
     <div class="col-md-4">
-        <h1>Register Here</h1>
+        <h1>Sign Up!</h1>
         <form id="registration" action="/register" method="POST">
             <div class="row">
                 <div class="col-xs-12">

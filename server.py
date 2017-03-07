@@ -267,10 +267,24 @@ def trip_detail(trip_code):
         trip_length = query_trip.num_days
         trip_loc = query_trip.start_loc
 
+
+
+        user_set = set()
+        # Query all users for the trip
+        query_users = UserTrip.query.filter(UserTrip.trip_code == trip_code).all()
+
+        for user in query_users:
+            user_set.add(user.user_id)
+            print "user ID : %s" % user.user_id
+
+        # get users that don't have that trip code
+        all_users = User.query.all()
+
         return render_template('trip_detail.html', username=username, name=name,
                     trip_name=trip_name, members=members, trips=sorted_trips,
                     trip_code=trip_code, items=items, messages=comments,
-                    trip_date=trip_date, trip_length=trip_length, trip_loc=trip_loc)
+                    trip_date=trip_date, trip_length=trip_length, trip_loc=trip_loc,
+                    users=all_users, user_set=user_set)
     else:
         flash("You are not logged in. Please do so.")
         return redirect('/')
@@ -322,7 +336,7 @@ def handleMessage(msg):
 
     username = session['user']
 
-    # print msg['room']
+    print msg['msg']
     # print username
 
     my_message = Comment(trip_code=msg['room'], user_id=username, comment=msg["msg"],

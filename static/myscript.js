@@ -52,6 +52,10 @@ function initMap() {
 
 
     plottingComplete(points);
+    
+        $("#second-image").slideUp();
+        $("#elevation_chart").attr("class", "col-xs-4");
+
   });
 
   chart = new google.visualization.ColumnChart(document.getElementById('elevation_chart'));
@@ -241,10 +245,8 @@ function plotElevation(results, status){
     for (var i = 0; i < results.length; i++) {
       data.addRow(['', elevation[i].elevation]);
     }
-    document.getElementById('elevation_chart').style.display = 'block';
+    // document.getElementById('elevation_chart').style.display = 'block';
     chart.draw(data, {
-      width: 300,
-      height: 300,
       legend: 'none',
       titleY: 'Elevation (m)'
     });
@@ -295,5 +297,22 @@ function queryGISDatabase(resultsMap) {
   });
 }
 
+$(document).ready(function () {
+  var statsDiv = $('#stats');
+  var todoDiv = $('#todolist');
+      $(".toggle-list").click(function (event) {
+        if (statsDiv.is(":visible")) {
+          statsDiv.slideUp(400, function() {
+            todoDiv.slideDown();
+          });
 
+        } else {
+          todoDiv.slideUp(400, function() {
+            statsDiv.slideDown();
+          });
+          event.preventDefault();
+        }
+        
+      });
+    });
 
