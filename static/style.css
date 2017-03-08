@@ -1,11 +1,101 @@
 /* We write our CSS here*/
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
-  padding-top: 70px;
+  padding-top: 0px;
+  background-image: url(ep_naturalwhite.png);
 }
 footer {
   padding-left: 15px;
-  padding-right: 15px;
+  padding-right: 0px;
 }
+
+nav.navbar, .navbar-default, .navbar-brand, .navbar-default, .navbar-nav, .navbar-header {
+  background-image: url(navbar2.jpeg);
+  margin-bottom: 0;
+  border: none;
+  color: #ffd200;
+  font-family: 'Architects Daughter', cursive;
+  font-size: 18px;
+
+}
+
+#appname{
+  margin: 15px;
+  font-size: 38px;
+  font-family: 'Architects Daughter', cursive;
+}
+
+#membpro, #lgo {
+    font-family: 'Architects Daughter', cursive;
+    color: #4A2C1D;
+}
+
+
+
+a, li, #todolist, #listfont {
+    font-family: 'Architects Daughter', cursive;
+    color: #0E4A3A;
+    font-size: 18px;
+}
+
+h1, h2, h3, h4, h5, h6, p, {
+    font-family: 'Architects Daughter', cursive;
+    color: #4A2C1D;
+}
+
+input[type="submit"] {
+  background: #ffe500;
+  margin: 0px;
+  border: 0;
+  /*width: 300px;*/
+  /*height: 60px;*/
+  /*border-radius: 3px;*/
+  color: #4A2C1D;
+  /*font-size: 12px;*/
+  cursor: pointer;
+  background-color: transparent;
+  transition: background 0.3s ease-in-out;
+  font-family: 'Architects Daughter', cursive;
+}
+
+/*.btn, .btn-primary, .addnew, .pull-right, .btn:hover {
+  margin: 25px;
+  padding: 15px 30px;
+  border: none;
+  font-family: 'Architects Daughter', cursive;
+  font-size: 28px;
+  line-height: 1;
+  color: #4A2C1D;
+  text-decoration: none;
+  background-color: transparent;
+
+}*/
+
+.panel-primary, .panel-heading {
+    border-color: #C99223;
+    /*background-color: #C99223;*/
+}
+
+
+.panel-primary>.panel-heading {
+    background-color: #D2AE64;
+    border-color: #C99223;
+    font-family: 'Architects Daughter', cursive;
+
+}
+
+.btn-warning, .btn:hover {
+    font-family: 'Architects Daughter', cursive;
+    color: #4A2C1D;
+    background-color: transparent;
+    border: none;
+}
+
 #header {
     position: fixed;
     z-index: 10;

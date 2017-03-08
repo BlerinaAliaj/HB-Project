@@ -13,25 +13,96 @@ body {
   line-height: 1.3;
   -webkit-font-smoothing: antialiased;
 
+
 }
 
+nav.navbar, .navbar-default, .navbar-brand, .navbar-default, .navbar-nav li a {
+  background-image: url(navbar2.jpeg);
+  margin-bottom: 0;
+  border: none;
+  color: #ffd200;
+  font-family: 'Architects Daughter', cursive;
+  font-size: 18px;
 
-
-
-.navbar, .navbar-default .navbar-brand, .navbar-default .navbar-nav li a {
-    background: rgba(0, 0, 0, 1);
-    border: none;
-    border-radius: 0;
-    color: #ffd200;
-    font-family: 'Pacifico', cursive;
-    font-size: 18px;
 }
 
-.navbar-default .navbar-brand:hover, .navbar-default .navbar-nav li a:hover {
+.navbar-default, .navbar-default .navbar-nav li a {
   color: #ED8429;
+  -webkit-font-smoothing: antialiased;
+}*/
+
+
+div.container-fluid {
+  /*margin-top: 30px;*/
+  margin-left: 15px;
+  display: flex;
+  align-items: center;
+  margin: 15px;
+  padding: 15px;
+
 }
 
-#h1left {
+.navbar-header {
+  font-family: 'Architects Daughter', cursive;
+  font-size: 28px;
+  margin-left: 30px;
+
+}
+
+
+.row {
+  background: rgba(201, 179, 121, 0.525);
+  height: 100%;
+  margin-top: 200px;
+  margin-left: 15px;
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+
+ /* padding-bottom: 80px;*/
+}
+
+#register {
+  margin: 0px;
+}
+#uname {
+  margin: 0px;
+}
+#uname1, #pwd1 {
+  color: #4A2C1D;
+  font-size: 18px;
+}
+
+#fname {
+  margin: 0px;
+}
+#lname {
+  margin: 0px;
+}
+#email {
+  margin: 0px;
+}
+#zipc {
+  margin: 0px;
+}
+#pwd {
+  margin: 0px;
+}
+
+#signup {
+  text-align: center;
+}
+
+h1, h2 {
+  font-family: 'Architects Daughter', cursive;
+}
+
+#appname{
+  margin: 36px;
+  font-size: 48px;
+}
+
+/*#h1left {
     color: #000;
     font-family: 'Pacifico', cursive;
     font-size:88px;
@@ -40,54 +111,25 @@ body {
     padding-bottom: 75px;
 }
 
-#h1right{
-    color: #ffe500;
-    font-family: 'Pacifico', cursive;
-    font-size:88px;
-    text-align: left;
-    padding-top: 40px;
-    padding-bottom: 75px;
+ opacity: .65;*/
+
+
+::-webkit-input-placeholder {
+  color: #4A2C1D;
 }
 
-#signup {
-    color: #ffe500;
-    font-family: 'Pacifico', cursive;
-    text-align: center;
-    padding-bottom: 10px;
-    margin-top: 0px;
+.form-control::-webkit-input-placeholder {
+  color: #4A2C1D;
+  font-size: 26px;
+  margin-top: 50px;
 }
 
-.left {
-/*    background-color: #ffd200;*/
-/*    opacity: .65;*/
-    background: rgba(255, 230, 20, 0.65);
-    height: 100%;
-    line-height: 1.3;
-    position: fixed;
-    width: 50%;
-    height: 100%;
-    top: 50px;
-    left: 0;
-}
-
-.right{
-/*    background-color: #000;
-    opacity: .65;*/
-    background: rgba(0, 0, 0, 0.85);
-    height: 100%;
-    line-height: 1.3;
-    right: 0;
-    position: fixed;
-    width: 50%;
-    height: 100%;
-    top: 50px;
-}
 
 p {
     margin-left: 150px;
     margin-right: 150px;
     text-align: center;
-    font-family: 'Open Sans Condensed', sans-serif;
+    font-family: 'Architects Daughter', cursive;
     font-weight: 700;
     font-size: 18px;
     color: #000;
@@ -98,47 +140,53 @@ input[type="text"], input[type="password"], input[type="email"] {
   padding: 10px 0px;
   background: transparent;
   border: 0;
-  border-bottom: 2px dashed #ffe500;
+  border-bottom: 3px dashed #4A2C1D;
   border-radius: 0;
   outline: none;
-  color: #ffd200;
+  color: #4A2C1D;
   font-size: 16px;
   text-align: center;
-  font-family: 'Open Sans Condensed', sans-serif;
+  /*font-family: 'Open Sans Condensed', sans-serif;*/
   font-weight: 300;
   font-style: italic;
   margin: 25px;
+  font-family: 'Architects Daughter', cursive;
 }
 
 input[type="submit"] {
   background: #ffe500;
+  margin: 0px;
   border: 0;
-  width: 350px;
-  height: 40px;
+  width: 300px;
+  height: 60px;
   border-radius: 3px;
-  color: #ffd200;
-  font-size: 12px;
+  color: #4A2C1D;
+  font-size: 18px;
   cursor: pointer;
+  background-color: transparent;
   transition: background 0.3s ease-in-out;
+  font-family: 'Architects Daughter', cursive;
 }
-input[type="submit"]:hover {
+/*input[type="submit"]:hover {
   background: #cccccc;
   animation-name: shake;
 }
+*/
 
-
-.btn {
+.btn, .btn-default, .btn:hover {
   margin: 25px;
   padding: 15px 30px;
-  border: 2px dashed #ffe500;
-  font-family: 'Pacifico', cursive;
-  font-size: 12px;
+  border: none;
+  font-family: 'Architects Daughter', cursive;
+  font-size: 28px;
   line-height: 1;
-  color: #ffd200;
+  color: #4A2C1D;
   text-decoration: none;
+  background-color: transparent;
+
 }
 
-.btn:hover {
-    color: #000;
-    background-color: #ffe500;
-}
+/*.btn:hover {
+    color: #4A2C1D;
+    background-color: #4A2C1D;
+}*/

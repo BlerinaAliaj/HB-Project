@@ -109,8 +109,14 @@ function showMarkers(data) {
 
 // Creates info window for each marker with option to add description
 function showMarkerWindow(marker) {
+
+  var markerDesc = marker.description;
+  if ( typeof(markerDesc) == "undefined")  {
+    markdesc = "No description";
+  }
+
   var content = 'Latitude: ' + marker.position.lat() + '<br />Longitude: ' + marker.position.lng();
-      content += "<br />Description:" + marker.description;
+      content += "<br />Description: " + markerDesc;
       content += "<br /><input type=text id='markdesc' name = 'markerdescription'>";
       content += "<input type='button' value='Update' onclick = 'addDescription(" + marker.id + ");' value = 'addDescription' />";
       content += "<br /><input type = 'button' value = 'Delete Marker' onclick = 'deleteMarker(" + marker.id + ")'; value='deleteMarker'/>";

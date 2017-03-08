@@ -75,11 +75,11 @@ if __name__ == "__main__":
 
     # Add Trips
     yos = Trip(trip_code='yose000', trip_name='Yosemite Winter Backpacking',
-                    date_created=datetime.datetime.now())
+                    date_created=datetime.datetime.now(), date_start=datetime.datetime.now())
     bv = Trip(trip_code='bear000', trip_name='Bear Valley Winter Backpacking',
-                    date_created=datetime.datetime.now())
+                    date_created=datetime.datetime.now(), date_start=datetime.datetime.now())
     kc = Trip(trip_code='king000', trip_name='King Canyon Summer Backpacking',
-                    date_created=datetime.datetime.now())
+                    date_created=datetime.datetime.now(), date_start=datetime.datetime.now())
 
     trip1 = UserTrip(trip_code='yose000', user_id='eagle5')
     trip2 = UserTrip(trip_code='bear000', user_id='eagle5')

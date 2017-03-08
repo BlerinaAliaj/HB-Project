@@ -5,6 +5,7 @@
         rel="stylesheet">
 
 <link href="/static/homepage.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Architects+Daughter" rel="stylesheet">
 
 {% endblock %}
 
@@ -13,29 +14,29 @@
 
 {% block content %}
 
-<div class="row">
+<div class="row" >
     <!--Columns go here-->
-    <div class="col-xs-8"> 
+    <div class="col-xs-7"> 
         <h1>Welcome to the One-Stop Location for adventure planning!</h1>
         <h2>Let's start!</h2>
     </div>
-    <div class="col-md-4">
-        <h1>Sign Up!</h1>
+    <div class="col-xs-5">
+        <h1 id="signup">Sign Up!</h1>
         <form id="registration" action="/register" method="POST">
-            <div class="row">
+            <div class="row" id="register">
                 <div class="col-xs-12">
                 <input id='uname' type="text" name="username" required placeholder="User Name" style="width: 100%">
                 </div>
             </div>
-            <div class="row">
+            <div class="row" id="register">
                 <div class="col-xs-6">
                 <input id='fname' type="text" name="firstname" required placeholder="First Name" style="width: 100%; padding-right: 0px">
                 </div>
-                <div class="col-xs-6">
+                <div class="col-xs-6" id='register'>
                 <input id='lname' type="text" name="lastname" required placeholder="Last Name" style="width: 100%; padding-left: 0px">
                 </div>
             </div>
-            <div class="row">
+            <div class="row" id="register">
                 <div class="col-xs-6">
                 <input id='email' type="email" name="email" required placeholder="Email" style="width: 100%; padding-left: 0px">
                 </div>
@@ -43,13 +44,13 @@
                 <input id='zipc' type="text" name="zipcode" placeholder="Zipcode" style="width: 100%; padding-left: 0px">
                 </div>
             </div>
-            <div class="row">
+            <div class="row" id="register">
                 <div class="col-xs-12">
                 <input id='pwd' type="password" name="password" required placeholder="Password" style="width: 100%; padding-left: 0px">
                 </div>
                 
             </div>
-            <input type="submit" value="submit"><br>
+            <input type="submit" value="Submit"><br>
         
         </form>
     </div>

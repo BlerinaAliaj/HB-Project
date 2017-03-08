@@ -8,6 +8,7 @@
   <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.0/united/bootstrap.min.css"
           rel="stylesheet">
   <link href="/static/style.css" rel="stylesheet">
+  <link href="/static/homepage.css" rel="stylesheet">
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.2/angular.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.2/angular-route.js"></script>
 
@@ -25,7 +26,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">My Icon Here</a>
+        <h1 id="appname">Hikr</h1>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
@@ -33,13 +34,13 @@
         
         <ul class="nav navbar-nav navbar-right">
           {% if 'user' in session %}
-            <li><a href="/profile">Member Profile</a></li>    
-            <li><a href="/logout">Logout</a></li>  
+            <li id="mempro"><a href="/profile">Member Profile</a></li>    
+            <li id="lgo"><a href="/logout">Logout</a></li>  
           {% else %}
             <form class="navbar-form navbar-right" action="/login" method="POST">
               <div class="form-group">
-                <input id="uname" type="text" class="form-control" placeholder="User Name" name='username'>
-                <input id="pwd" type="password" class="form-control" placeholder="Password" name='password'>
+                <input id="uname1" type="text" class="form-control" placeholder="User Name" name='username'>
+                <input id="pwd1" type="password" class="form-control" placeholder="Password" name='password'>
               </div>
               <button type="submit" class="btn btn-default">Login</button>
             </form>  

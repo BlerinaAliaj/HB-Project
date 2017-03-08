@@ -11,7 +11,7 @@
 
 $(".tripform").on('click', function() {
   submitTrip(evt);
-  $("#myModal").modal('hide');
+  // $("#myModal").modal('hide');
 
 });
 

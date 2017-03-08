@@ -12,7 +12,7 @@ $(document).ready(function() {
 
 
 socket.on('message', function(msg) {
-  $("#messages").append('<li class="right clearfix"><span class="chat-img pull-right"><img src="http://placehold.it/50/FA6F57/fff&text=ME" alt="User Avatar" class="img-circle"/></span><div class="chat-body clearfix"><div class="header"><small class=" text-muted"><span class="glyphicon glyphicon-time"></span>13 mins ago</small><strong class="pull-right primary-font">'+ userid + '</strong></div><p>' + msg +'</p></div></li>');
+  $("#messages").append('<li class="right clearfix"><span class="chat-img pull-right"><img src="http://placehold.it/50/C5D4A4/fff&text=ME" alt="User Avatar" class="img-circle"/></span><div class="chat-body clearfix"><div class="header"><small class=" text-muted"><span class="glyphicon glyphicon-time"></span>a moment ago</small><strong class="pull-right primary-font">'+ userid + '</strong></div><p>' + msg +'</p></div></li>');
   console.log('Received message');
 });
 
