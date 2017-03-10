@@ -172,17 +172,6 @@ def display_friend_info(user_id):
     pass
 
 
-# @app.route('/new_trip', methods=["GET"])
-# def get_trip_data():
-#     """Template to create new trip"""
-
-#     if 'user' in session:
-#         return render_template("new_trip.html")
-#     else:
-#         flash("You are not logged in. Please do so.")
-#         return redirect('/')
-
-
 @app.route('/new_trip', methods=["POST"])
 def create_trip():
     """Route that will log new trip information to database"""
@@ -196,15 +185,17 @@ def create_trip():
 
         # Generate trip code here:
         trip_abbr = trip_name[:4].lower()
+        print trip_abbr
         query_trips = Trip.query.all()
 
         for trip in query_trips:
             if trip.trip_code[:4] == trip_abbr:
 
                 appx = int(trip.trip_code[4:])
+                print "appx is %i" % appx
                 appx += 1
                 trip_code = trip_abbr + format(appx, "03")
-                # print trip_code
+                print trip_code
                 break
             else:
                 trip_code = trip_abbr + "000"
@@ -590,7 +581,7 @@ if __name__ == "__main__":
     connect_to_db(app)
 
     # Use the DebugToolbar
-    # DebugToolbarExtension(app)
+    DebugToolbarExtension(app)
 
     # app.run(port=5000, host='0.0.0.0')
     # for websockets use the socketio.run instead of app.run

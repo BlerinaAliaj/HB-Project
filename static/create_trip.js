@@ -1,24 +1,9 @@
 // This is JS to create new trip
-// $("#mylink").on("click", function(evt) {
-//   evt.preventDefault();
-//   $(".col-xs-12").attr("style", "display:inline");
 
-// });
-
-// $("#minimize").on("click", function(evt) {
-//   $(".col-xs-12").attr("style", "display:none");
-// });
-
-$(".tripform").on('click', function() {
-  submitTrip(evt);
-  // $("#myModal").modal('hide');
-
-});
-
+$(".tripform").on('submit', submitTrip);
 
 function submitTrip(evt) {
   evt.preventDefault();
-  // var tripcode = $("#tripc").val()
   var tripname = $("#tripn").val();
   tripData = {"tripname": $("#tripn").val(),
               "datestart": $("#sdate").val(),
@@ -33,5 +18,5 @@ function submitTrip(evt) {
     console.log(tripCode);
     var new_line = "<li><a href='/trip_detail/"+tripCode+"'>"+tripname+"</a></li>";
     $("#new_trip").before(new_line) ;});
-    // $("#myModal").modal('hide');
+    document.getElementById("ntform").reset();
 }

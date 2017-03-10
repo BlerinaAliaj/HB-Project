@@ -129,29 +129,24 @@ google.load('visualization', '1', {packages: ['columnchart']});
               {% endraw %}
               </ul>
             </div>
-
-
-            <li><a id="mylink" data-toggle="modal" data-target="#myModal" href="/new_trip">Create New Trip</a></li>
+            <li><a id="mylink" data-toggle="modal" data-target="#myModal" href="">Create New Trip</a></li>
             <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
               <div class="modal-dialog" role="document">
                 <div class="modal-content" >
                   <div class="modal-body">
                     <h3 class="modal-title" id="myModalLabel">Please fill out information about your trip below:</h3>
-                    <form class="tripform" action="/new_trip" method="POST">
+                    <form class="tripform" id="ntform" action="/new_trip" method="POST">
                     Trip Name: <input id="tripn" type="text" name="tripname"><br>
                     Start Date: <input id="sdate" type="date" name="datestart"><br>
                     Number of Days: <input id="numdays" type="number" name="numdays"><br>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Minimize</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
                     </form>
                   </div>
                 </div>
               </div>
             </div>
             <li><a href="" class="toggle-list">To-Do-List</a></li>
-        
-        <!-- <li class="active"><a href="#">To-Do-List</a></li> -->
-        <!-- <li><a href="#">Messages</a></li> -->
         
         </ul>
       </div>
@@ -172,28 +167,6 @@ google.load('visualization', '1', {packages: ['columnchart']});
     </div>
 
   </div>
-
-<!--   <div class="col-md-3">
-    <div id="chatlogs" style="width: 600px" >
-      <h3>Group Communication:</h3>
-  
-      <ul id="messages" style="height: 100px; overflow-y:scroll">
-        {% for msg in messages %}
-          <li style="width: 100">{{ msg.user_id }} wrote: {{ msg.comment }}</li>
-
-        {% endfor %}
-      </ul>
-    </div>
-    <div id="chat-end"></div>
-
-    <div >
-      <form id="sendmessage">
-        <textarea rows="4" cols="40" id="mytext" name="mymessage"></textarea>
-        <input id="sendbutton" type="button" value="Send Message">
-      </form>
-    </div>
-  </div>
-</div> -->
 
 <div class="col-md-3">
     <div class="row form-group">
