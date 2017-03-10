@@ -1,4 +1,4 @@
-# Hiker
+# Hikr
 
 Hikr is an application that provides integrated collaborative planning tools.
 It allows users to create hiking trips, add members, share information, communicate, 
