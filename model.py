@@ -35,6 +35,7 @@ class User(db.Model):
     email = db.Column(db.String(64), nullable=False)
     password = db.Column(db.String(64), nullable=False)
     zipcode = db.Column(db.String(15), nullable=True)
+    phone_number = db.Column(db.String(30), nullable=True)
 
     # Create relationship to trip data through users_trips table
     trips = db.relationship("Trip", secondary="users_trips", backref="users")

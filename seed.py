@@ -67,11 +67,11 @@ if __name__ == "__main__":
 
     # Add Users
     alain = User(user_id='eagle5', first_name='Alain', last_name='Rodriguez',
-                 email='eagle5@gmail.com', password='alain', zipcode='94115')
+                 email='eagle5@gmail.com', password='alain', zipcode='94115', phone_number='13052153894')
     sofiane = User(user_id='souali', first_name='Sofiane', last_name='Ouali',
-                 email='sofiane@gmail.com', password='sofiane', zipcode='94116')
+                 email='sofiane@gmail.com', password='sofiane', zipcode='94116',phone_number='17274206801' )
     henry = User(user_id='hlin', first_name='Henry', last_name='Lin',
-                 email='henry@gmail.com', password='henry', zipcode='94117')
+                 email='henry@gmail.com', password='henry', zipcode='94117', phone_number='17274206801')
 
     # Add Trips
     yos = Trip(trip_code='yose000', trip_name='Yosemite Winter Backpacking',

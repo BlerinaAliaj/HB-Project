@@ -1,5 +1,5 @@
-"""Hiker App"""
-
+"""Hikr App"""
+import os
 from jinja2 import StrictUndefined
 from flask import Flask, render_template, redirect, request, flash, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
@@ -9,6 +9,7 @@ import datetime
 from flask_socketio import SocketIO, send, emit, join_room
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+from twilio.rest import Client
 
 app = Flask(__name__)
 
@@ -16,6 +17,14 @@ app = Flask(__name__)
 # app.secret_key = "wonderwall"
 
 app.config['SECRET_KEY'] = 'mysecret'
+google_maps_key = os.environ['GOOGLE_MAPS_ACCESS_TOKEN']
+
+account_sid = os.environ['TWILIO_SID']
+auth_token = os.environ['AUTH_TOKEN']
+my_phone_num = os.environ['PHONE_NUM']
+
+client = Client(account_sid, auth_token)
+
 socketio = SocketIO(app)
 
 # Normally, if you use an undefined variable in Jinja2, it fails
@@ -24,7 +33,6 @@ socketio = SocketIO(app)
 app.jinja_env.undefined = StrictUndefined
 
 # Create connection to my 'gis' database
-
 gis_db = create_engine('postgresql:///gis')
 GISSession = sessionmaker(gis_db)
 
@@ -159,7 +167,35 @@ def user_detail():
 def logout():
     """Logs out user"""
 
+    if "changes" in session:
+        user = User.query.get(session['user']).first_name
+        message_nums = {}
+
+        for trip in set(session['changes'].strip(',').split(',')):
+            # Get trip name for the trip
+            trip_name = Trip.query.get(trip).trip_name
+            # Query all phone numbers for members of that trip
+            query_members = UserTrip.query.filter_by(trip_code=trip).all()
+
+            # Add each number to dictionary where phone number is key and 
+            # trip name is value
+
+            for memb in query_members:
+                phone_num = str(memb.user.phone_number)
+                if phone_num != "":
+                    message_nums[phone_num] = message_nums.get(phone_num, set()) | set([trip_name])
+        
+        print message_nums
+
+        for num in message_nums:
+            message_string = user + " has made changes to your " + ', '.join(message_nums[num]) + " trips"
+            message = client.messages.create(to=num,
+                                    from_=my_phone_num,
+                                    body=message_string)
+        del session["changes"]
+    
     del session["user"]
+    
     flash("You have been successfully logged out.")
 
     return redirect('/')
@@ -275,7 +311,7 @@ def trip_detail(trip_code):
                     trip_name=trip_name, members=members, trips=sorted_trips,
                     trip_code=trip_code, items=items, messages=comments,
                     trip_date=trip_date, trip_length=trip_length, trip_loc=trip_loc,
-                    users=all_users, user_set=user_set)
+                    users=all_users, user_set=user_set, google_maps_key=google_maps_key)
     else:
         flash("You are not logged in. Please do so.")
         return redirect('/')
@@ -419,6 +455,8 @@ def add_to_list():
             db.session.add(my_list)
             db.session.commit()
 
+    session['changes'] = session.get('changes', '') + trip_code + ','
+
     query_data = CheckList.query.filter_by(trip_code=trip_code).all()
 
     my_json = {}
@@ -467,6 +505,8 @@ def add_members(trip_code):
     db.session.add(new_member)
     db.session.commit()
 
+    session['changes'] = session.get('changes', '') + trip_code + ','
+
     return redirect("/trip_detail/"+trip_code)
 
 
@@ -511,6 +551,9 @@ def add_marker_data():
         marker = Route(trip_code=trip_code, lon=lon, lat=lat, description=desc)
         db.session.add(marker)
         db.session.commit()
+
+    session['changes'] = session.get('changes', '') + trip_code + ','
+    print "session is %s" % session
 
     return redirect("/trip_detail/"+trip_code)
 

@@ -184,6 +184,7 @@ google.load('visualization', '1', {packages: ['columnchart']});
                             </span>
                                 <div class="chat-body clearfix">
                                     <div class="header">
+                                        <small class=" text-muted"><span class="glyphicon glyphicon-time"></span>{{ msg.time }}</small>
                                         <strong class="primary-font">{{ msg.user_id }}</strong> <small class="pull-right text-muted">
                                     </div>
                                     <p>{{ msg.comment }}</p>
@@ -195,7 +196,7 @@ google.load('visualization', '1', {packages: ['columnchart']});
                             </span>
                                 <div class="chat-body clearfix">
                                     <div class="header">
-                                        <small class=" text-muted"><span class="glyphicon glyphicon-time"></span>a moment ago</small>
+                                        <small class=" text-muted"><span class="glyphicon glyphicon-time"></span>{{ msg.time }}</small>
                                         <strong class="pull-right primary-font">{{ msg.user_id }}</strong>
                                     </div>
                                     <p> {{ msg.comment }} </p>
@@ -242,7 +243,7 @@ var userid = "{{ username }}";
 <script src="/static/my_ang.js"></script>
 <script src="/static/create_trip.js"></script>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=key&callback=initMap"
+<script src="https://maps.googleapis.com/maps/api/js?key={{google_maps_key}}&callback=initMap"
 async defer></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
