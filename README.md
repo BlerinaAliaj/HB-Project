@@ -84,22 +84,22 @@ Some of Hikr maping features (trails and elevation profile) depend on dataset ob
 
 ### How to use Hikr
 *   Register as a new user or Log-in if you have already an account.
-*   ![Alt text](/static/image1.png?raw=true "Login In Page")
+    ![Alt text](/static/image1.png?raw=true "Login In Page")
 *   Once you log-in, you will be directed to the last trip you organized/recent trip page.
 *   To create new trip click on the "Create New Trip", input trip information and click "Submit".
 *   On the trip page you can add members to the trip by using a drop-down list of users with their names and user names listed, and you can create new trips by clicking the Create New Trip link. 
 *   You can use the messaging app to send messages to all members in your trip
-*   ![Alt text](/static/image2.png?raw=true "Trip Page") 
+    ![Alt text](/static/image2.png?raw=true "Trip Page") 
 *   You can add action items by clicking on the To-Do-List and save by clicking Submit.
-*   ![Alt text](/static/image3.png?raw=true "To-Do List")
+    ![Alt text](/static/image3.png?raw=true "To-Do List")
 *   To create a route you can search the trailhead on the search window and click "Search" button to pan the map to the area
 *   Your map will be loaded with trails (colorcoded) in the area you searched and a list of the trails with trailnames will be displayed in the right hand side of the map. 
 *   You can click on any trail and you will be able to see an elevation profile for that trail.
-*   ![Alt text](/static/image4.png?raw=true "Altitude Profile") 
+    ![Alt text](/static/image4.png?raw=true "Altitude Profile") 
 *   You can double click on the map to create a marker 
 *   To add note on marker you can right click to add a comment and "Update" to save your comment
 *   Once all markers for your route have been added, click "Log This Route" to save your trip information.
-*   ![Alt text](/static/image5.png?raw=true "Add Markers")
+    ![Alt text](/static/image5.png?raw=true "Add Markers")
 *   All data entered for the trip will be saved next time you login and visit the trip page.
 
 ### Author
