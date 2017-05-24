@@ -26,6 +26,7 @@ share trip route points and general details about the trip.
 * [OpenStreetMap (OSM) Dataset]
 * [Osm2pgsql]
 * [Google Maps API] 
+* [Twilio API]
  (dependencies are listed in requirements.txt)
 
 ### How to locally run Hikr
@@ -82,21 +83,34 @@ Some of Hikr maping features (trails and elevation profile) depend on dataset ob
 * Go to localhost:5000 to interact with the app
 
 ### How to use Hikr
-*   Create an account on the registration page
-*   Once account is created, you will be routed to your user page 
-*   To create new trip click on the "Create New Trip"
-*   Input trip information and click "Submit". You will be routed to the trip page
-*   On the trip page you can add members to the trip by using a drop-down list of users with their names and user names listed
-*   You can create new trips by clicking the Create New Trip link. 
-*   You can add action items by clicking on the To-Do-List and save by clicking Submit.
+*   Register as a new user or Log-in if you have already an account.
+*   ![alt text][image1]
+*   Once you log-in, you will be directed to the last trip you organized/recent trip page.
+*   To create new trip click on the "Create New Trip", input trip information and click "Submit".
+*   On the trip page you can add members to the trip by using a drop-down list of users with their names and user names listed, and you can create new trips by clicking the Create New Trip link. 
 *   You can use the messaging app to send messages to all members in your trip
+*   ![alt text][image2] 
+*   You can add action items by clicking on the To-Do-List and save by clicking Submit.
+*   ![alt text][image3] 
 *   To create a route you can search the trailhead on the search window and click "Search" button to pan the map to the area
 *   Your map will be loaded with trails (colorcoded) in the area you searched and a list of the trails with trailnames will be displayed in the right hand side of the map. 
 *   You can click on any trail and you will be able to see an elevation profile for that trail.
+*   ![alt text][image4] 
 *   You can double click on the map to create a marker 
 *   To add note on marker you can right click to add a comment and "Update" to save your comment
 *   Once all markers for your route have been added, click "Log This Route" to save your trip information.
+*   ![alt text][image5]
 *   All data entered for the trip will be saved next time you login and visit the trip page.
+
+[image1]: https://github.com/BlerinaAliaj/HB-Project/tree/master/static/image1.png "Login In Page"
+[image2]: https://github.com/BlerinaAliaj/HB-Project/tree/master/static/image2.png "
+Trip Page"
+[image3]: https://github.com/BlerinaAliaj/HB-Project/tree/master/static/image3.png "
+To-Do List"
+[image4]: https://github.com/BlerinaAliaj/HB-Project/tree/master/static/image4.png "
+Altitude Profile"
+[image5]: https://github.com/BlerinaAliaj/HB-Project/tree/master/static/image5.png "
+Add Markers"
 
 ### Author
 
@@ -118,6 +132,7 @@ Blerina Aliaj is an Electrical Engineer entering the world of Software Engineeri
    [OpenStreetMap (OSM) Dataset]: <https://en.wikipedia.org/wiki/OpenStreetMap>
    [Osm2pgsql]: <http://wiki.openstreetmap.org/wiki/Osm2pgsql>
    [Google Maps API]: <https://developers.google.com/maps/>
+   [Twilio API]: <https://www.twilio.com/docs/>
 
 
 

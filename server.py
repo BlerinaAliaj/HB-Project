@@ -177,14 +177,14 @@ def logout():
             # Query all phone numbers for members of that trip
             query_members = UserTrip.query.filter_by(trip_code=trip).all()
 
-            # Add each number to dictionary where phone number is key and 
+            # Add each number to dictionary where phone number is key and
             # trip name is value
 
             for memb in query_members:
                 phone_num = str(memb.user.phone_number)
                 if phone_num != "":
                     message_nums[phone_num] = message_nums.get(phone_num, set()) | set([trip_name])
-        
+
         print message_nums
 
         for num in message_nums:
@@ -193,9 +193,9 @@ def logout():
                                     from_=my_phone_num,
                                     body=message_string)
         del session["changes"]
-    
+
     del session["user"]
-    
+
     flash("You have been successfully logged out.")
 
     return redirect('/')
